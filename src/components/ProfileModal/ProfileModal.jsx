@@ -21,14 +21,17 @@ function ProfileModal({ user, onClose }) {
       alert('Perfil atualizado com sucesso!');
       window.location.reload(); // Recarrega para atualizar header
     } catch (error) {
-      // Se erro 401, significa que a sessão expirou
-      if (error.message.includes('Could not validate credentials')) {
+      // Se erro de sessão expirada
+      if (error.message === 'SESSION_EXPIRED') {
         alert('Sua sessão expirou. Por favor, faça login novamente.');
         await authService.logout();
         window.location.reload();
         return;
       }
-      throw error; // Repassa erro para o formulário
+      
+      // Mostra mensagem de erro amigável
+      alert(`Erro ao atualizar perfil: ${error.message}`);
+      console.error('Erro detalhado:', error);
     }
   };
 

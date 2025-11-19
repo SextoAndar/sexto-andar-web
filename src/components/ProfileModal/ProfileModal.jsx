@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import authService from '../../services/authService';
 import EditProfileForm from '../EditProfileForm/EditProfileForm';
 import './ProfileModal.css';
@@ -7,6 +7,13 @@ function ProfileModal({ user, onClose }) {
   const [activeTab, setActiveTab] = useState('geral');
   const [isEditing, setIsEditing] = useState(false);
   const [currentUser, setCurrentUser] = useState(user);
+  const [imgSrc, setImgSrc] = useState(
+    user.hasProfilePicture
+      ? `http://localhost:8001/auth/profile/picture/${user.id}`
+      : '/default-pp.png'
+  );
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef();
 
   const handleLogout = async () => {
     await authService.logout();
@@ -35,11 +42,56 @@ function ProfileModal({ user, onClose }) {
     }
   };
 
-  const getProfilePictureUrl = (userId, hasProfilePicture) => {
+
+  // Atualiza preview da foto
+  const refreshProfilePicture = (hasProfilePicture) => {
     if (hasProfilePicture) {
-      return `http://localhost:8001/auth/profile/picture/${userId}`;
+      setImgSrc(`http://localhost:8001/auth/profile/picture/${currentUser.id}?t=${Date.now()}`);
+    } else {
+      setImgSrc('/default-pp.png');
     }
-    return '/default-pp.png';
+  };
+
+  // Upload handler
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Arquivo muito grande! Máximo 5MB');
+      return;
+    }
+    if (!['image/jpeg', 'image/jpg', 'image/png', 'image/gif'].includes(file.type)) {
+      alert('Formato inválido! Use JPEG, PNG ou GIF');
+      return;
+    }
+    setIsUploading(true);
+    try {
+      const result = await authService.uploadProfilePicture(file);
+      setCurrentUser(result.user);
+      refreshProfilePicture(true);
+      alert('Foto de perfil atualizada!');
+    } catch (err) {
+      alert('Erro ao enviar foto: ' + err.message);
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  // Remover foto
+  const handleDeletePhoto = async () => {
+    if (!window.confirm('Remover foto de perfil?')) return;
+    setIsUploading(true);
+    try {
+      const result = await authService.deleteProfilePicture();
+      setCurrentUser(result.user);
+      refreshProfilePicture(false);
+      alert('Foto removida!');
+    } catch (err) {
+      alert('Erro ao remover foto: ' + err.message);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -59,12 +111,36 @@ function ProfileModal({ user, onClose }) {
   return (
     <div className="profile-modal-content">
       <div className="profile-header">
-        <img 
-          src={getProfilePictureUrl(currentUser.id, currentUser.hasProfilePicture)}
-          alt="Profile"
-          className="profile-avatar-large"
-          onError={(e) => e.target.src = '/default-pp.png'}
-        />
+        <div style={{ position: 'relative' }}>
+          <img
+            src={imgSrc}
+            alt="Profile"
+            className="profile-avatar-large"
+            onError={(e) => e.target.src = '/default-pp.png'}
+            style={{ cursor: 'pointer', opacity: isUploading ? 0.5 : 1 }}
+            title="Clique para alterar foto"
+            onClick={() => fileInputRef.current && fileInputRef.current.click()}
+          />
+          <input
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/gif"
+            style={{ display: 'none' }}
+            ref={fileInputRef}
+            onChange={handlePhotoChange}
+            disabled={isUploading}
+          />
+          {currentUser.hasProfilePicture && (
+            <button
+              className="action-btn danger"
+              style={{ position: 'absolute', top: 0, right: 0, padding: '0.3rem 0.7rem', fontSize: '0.9rem' }}
+              onClick={handleDeletePhoto}
+              disabled={isUploading}
+              title="Remover foto"
+            >
+              ✖
+            </button>
+          )}
+        </div>
         <div className="profile-info">
           <h2>{currentUser.fullName}</h2>
           <p className="profile-username">@{currentUser.username}</p>
@@ -170,7 +246,22 @@ function ProfileModal({ user, onClose }) {
                 <button className="action-btn secondary" onClick={() => setIsEditing(true)}>
                   ✏️ Editar Perfil
                 </button>
-                <button className="action-btn secondary">📸 Alterar Foto</button>
+                <button
+                  className="action-btn secondary"
+                  onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                  disabled={isUploading}
+                >
+                  📸 {isUploading ? 'Enviando...' : 'Alterar Foto'}
+                </button>
+                {currentUser.hasProfilePicture && (
+                  <button
+                    className="action-btn danger"
+                    onClick={handleDeletePhoto}
+                    disabled={isUploading}
+                  >
+                    Remover Foto
+                  </button>
+                )}
               </div>
             </>
           )}

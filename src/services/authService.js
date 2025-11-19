@@ -3,6 +3,38 @@
 const API_URL = '/api/auth';
 
 export const authService = {
+    // Upload de foto de perfil
+    async uploadProfilePicture(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await fetch(`${API_URL}/profile/picture`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData // NÃO definir Content-Type, o browser faz isso
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || 'Erro ao enviar foto de perfil');
+      }
+      // Atualiza user local
+      const user = await this.getMe();
+      return { ...data, user };
+    },
+
+    // Remover foto de perfil
+    async deleteProfilePicture() {
+      const response = await fetch(`${API_URL}/profile/picture`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || 'Erro ao remover foto de perfil');
+      }
+      // Atualiza user local
+      const user = await this.getMe();
+      return { ...data, user };
+    },
   // Login
   async login(credentials) {
     try {

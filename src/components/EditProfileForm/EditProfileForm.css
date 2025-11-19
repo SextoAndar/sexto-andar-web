@@ -1,0 +1,43 @@
+.edit-profile-form {
+  padding: 1rem 0;
+}
+
+.edit-profile-form h3 {
+  margin: 0 0 1.5rem 0;
+  color: #333;
+  font-size: 1.25rem;
+}
+
+.edit-profile-form h4 {
+  margin: 2rem 0 1rem 0;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.password-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #f0f0f0;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.form-actions button {
+  flex: 1;
+}

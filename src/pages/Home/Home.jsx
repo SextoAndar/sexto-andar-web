@@ -2,12 +2,16 @@ import { useState } from 'react';
 import Header from '../../components/Header/Header';
 import Modal from '../../components/common/Modal/Modal';
 import LoginForm from '../../components/LoginForm/LoginForm';
+import ProfileModal from '../../components/ProfileModal/ProfileModal';
 import authService from '../../services/authService';
 import './Home.css';
 
 function Home() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const user = authService.getUser();
 
   const handleLogin = async (formData) => {
     setIsLoading(true);
@@ -16,6 +20,7 @@ function Home() {
       console.log('Login realizado com sucesso:', response.user);
       alert(`Bem-vindo(a), ${response.user.fullName}!`);
       setIsLoginModalOpen(false);
+      window.location.reload(); // Recarrega para atualizar o header
     } catch (error) {
       console.error('Erro ao fazer login:', error);
       alert(`Erro ao fazer login: ${error.message}`);
@@ -41,6 +46,7 @@ function Home() {
       const userName = loginResponse.user?.fullName || loginResponse.user?.username || 'usuário';
       alert(`Conta criada com sucesso! Bem-vindo(a), ${userName}!`);
       setIsLoginModalOpen(false);
+      window.location.reload(); // Recarrega para atualizar o header
     } catch (error) {
       console.error('Erro ao fazer cadastro:', error);
       alert(`Erro ao criar conta: ${error.message}`);
@@ -60,7 +66,10 @@ function Home() {
 
   return (
     <div className="home-page">
-      <Header onLoginClick={() => setIsLoginModalOpen(true)} />
+      <Header 
+        onLoginClick={() => setIsLoginModalOpen(true)}
+        onProfileClick={() => setIsProfileModalOpen(true)}
+      />
       
       <main className="home-content">
         <section className="hero-section">
@@ -87,6 +96,14 @@ function Home() {
           onClose={() => setIsLoginModalOpen(false)}
           isLoading={isLoading}
         />
+      </Modal>
+
+      <Modal 
+        isOpen={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)}
+        title="Meu Perfil"
+      >
+        {user && <ProfileModal user={user} onClose={() => setIsProfileModalOpen(false)} />}
       </Modal>
     </div>
   );

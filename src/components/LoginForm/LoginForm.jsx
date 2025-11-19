@@ -1,27 +1,54 @@
 import { useState } from 'react';
 import Input from '../common/Input/Input';
 import Button from '../common/Button/Button';
+import Select from '../common/Select/Select';
+import Checkbox from '../common/Checkbox/Checkbox';
 import './LoginForm.css';
 
 function LoginForm({ onSubmit, onClose }) {
   const [activeTab, setActiveTab] = useState('login');
-  const [formData, setFormData] = useState({
+  const [loginData, setLoginData] = useState({
     email: '',
     password: ''
   });
+  const [signupData, setSignupData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    userType: 'Inquilino',
+    password: '',
+    acceptTerms: false
+  });
 
-  const handleChange = (e) => {
+  const handleLoginChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setLoginData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
+  const handleSignupChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setSignupData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    if (activeTab === 'login') {
+      onSubmit(loginData);
+    } else {
+      onSubmit(signupData);
+    }
   };
+
+  const userTypeOptions = [
+    { value: 'Inquilino', label: 'Inquilino' },
+    { value: 'Proprietário', label: 'Proprietário' }
+  ];
 
   return (
     <div className="login-modal-content">
@@ -47,33 +74,98 @@ function LoginForm({ onSubmit, onClose }) {
         </button>
       </div>
 
-      <form className="login-form" onSubmit={handleSubmit}>
-        <Input
-          type="email"
-          label="Email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="seu@email.com"
-          required
-        />
-        <Input
-          type="password"
-          label="Senha"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          placeholder="Sua senha"
-          required
-        />
-        <Button type="submit" variant="primary">
-          Entrar
-        </Button>
-      </form>
+      {activeTab === 'login' ? (
+        <form className="login-form" onSubmit={handleSubmit}>
+          <Input
+            type="email"
+            label="Email"
+            name="email"
+            value={loginData.email}
+            onChange={handleLoginChange}
+            placeholder="seu@email.com"
+            required
+          />
+          <Input
+            type="password"
+            label="Senha"
+            name="password"
+            value={loginData.password}
+            onChange={handleLoginChange}
+            placeholder="Sua senha"
+            required
+          />
+          <Button type="submit" variant="primary">
+            Entrar
+          </Button>
+        </form>
+      ) : (
+        <form className="login-form" onSubmit={handleSubmit}>
+          <Input
+            type="text"
+            label="Nome Completo"
+            name="fullName"
+            value={signupData.fullName}
+            onChange={handleSignupChange}
+            placeholder="Seu nome completo"
+            required
+          />
+          <Input
+            type="email"
+            label="Email"
+            name="email"
+            value={signupData.email}
+            onChange={handleSignupChange}
+            placeholder="seu@email.com"
+            required
+          />
+          <Input
+            type="tel"
+            label="Telefone"
+            name="phone"
+            value={signupData.phone}
+            onChange={handleSignupChange}
+            placeholder="(11) 99999-9999"
+            required
+          />
+          <Select
+            label="Tipo de Usuário"
+            name="userType"
+            value={signupData.userType}
+            onChange={handleSignupChange}
+            options={userTypeOptions}
+            required
+          />
+          <Input
+            type="password"
+            label="Senha"
+            name="password"
+            value={signupData.password}
+            onChange={handleSignupChange}
+            placeholder="Crie uma senha segura"
+            required
+          />
+          <Checkbox
+            name="acceptTerms"
+            checked={signupData.acceptTerms}
+            onChange={handleSignupChange}
+            label={
+              <>
+                Aceito os <a href="#" onClick={(e) => e.preventDefault()}>termos de uso</a> e <a href="#" onClick={(e) => e.preventDefault()}>política de privacidade</a>
+              </>
+            }
+            required
+          />
+          <Button type="submit" variant="primary">
+            Criar Conta
+          </Button>
+        </form>
+      )}
 
-      <div className="login-footer">
-        <a href="#" className="forgot-password">Esqueci minha senha</a>
-      </div>
+      {activeTab === 'login' && (
+        <div className="login-footer">
+          <a href="#" className="forgot-password">Esqueci minha senha</a>
+        </div>
+      )}
     </div>
   );
 }

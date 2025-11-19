@@ -161,12 +161,6 @@ function ProfileModal({ user, onClose }) {
         >
           Perfil
         </button>
-        <button 
-          className={`profile-tab ${activeTab === 'config' ? 'active' : ''}`}
-          onClick={() => setActiveTab('config')}
-        >
-          Configurações
-        </button>
       </div>
 
       {activeTab === 'geral' && (
@@ -268,12 +262,7 @@ function ProfileModal({ user, onClose }) {
         </div>
       )}
 
-      {activeTab === 'config' && (
-        <div className="profile-details">
-          <h3>Configurações</h3>
-          <p className="empty-message">Em desenvolvimento...</p>
-        </div>
-      )}
+      {/* Aba de configurações removida */}
     </div>
   );
 }

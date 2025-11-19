@@ -66,12 +66,10 @@ export const authService = {
 
       const data = await response.json();
       
-      // Salva dados do usuário no localStorage
-      if (data.user) {
-        localStorage.setItem('user', JSON.stringify(data.user));
-      }
+      // API retorna o usuário diretamente (AuthUser)
+      localStorage.setItem('user', JSON.stringify(data));
 
-      return data;
+      return { user: data }; // Normaliza o retorno
     } catch (error) {
       console.error('Erro no cadastro:', error);
       throw error;

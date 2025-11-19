@@ -27,9 +27,19 @@ function Home() {
   const handleRegister = async (formData) => {
     setIsLoading(true);
     try {
-      const response = await authService.register(formData);
-      console.log('Cadastro realizado com sucesso:', response.user);
-      alert(`Conta criada com sucesso! Bem-vindo(a), ${response.user.fullName}!`);
+      // 1. Cadastro (não faz login automático)
+      const registerResponse = await authService.register(formData);
+      console.log('Cadastro realizado com sucesso:', registerResponse.user);
+      
+      // 2. Login automático após cadastro
+      const loginResponse = await authService.login({
+        username: formData.username,
+        password: formData.password
+      });
+      
+      console.log('Login automático realizado:', loginResponse.user);
+      const userName = loginResponse.user?.fullName || loginResponse.user?.username || 'usuário';
+      alert(`Conta criada com sucesso! Bem-vindo(a), ${userName}!`);
       setIsLoginModalOpen(false);
     } catch (error) {
       console.error('Erro ao fazer cadastro:', error);

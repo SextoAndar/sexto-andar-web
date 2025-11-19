@@ -2,22 +2,49 @@ import { useState } from 'react';
 import Header from '../../components/Header/Header';
 import Modal from '../../components/common/Modal/Modal';
 import LoginForm from '../../components/LoginForm/LoginForm';
+import authService from '../../services/authService';
 import './Home.css';
 
 function Home() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (formData) => {
+    setIsLoading(true);
     try {
-      console.log('Dados de login:', formData);
-      // Aqui você fará a chamada para sua API de autenticação
-      // Exemplo: await authService.login(formData);
-      
-      alert('Login realizado com sucesso!');
+      const response = await authService.login(formData);
+      console.log('Login realizado com sucesso:', response.user);
+      alert(`Bem-vindo(a), ${response.user.fullName}!`);
       setIsLoginModalOpen(false);
     } catch (error) {
       console.error('Erro ao fazer login:', error);
-      alert('Erro ao fazer login. Verifique suas credenciais.');
+      alert(`Erro ao fazer login: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRegister = async (formData) => {
+    setIsLoading(true);
+    try {
+      const response = await authService.register(formData);
+      console.log('Cadastro realizado com sucesso:', response.user);
+      alert(`Conta criada com sucesso! Bem-vindo(a), ${response.user.fullName}!`);
+      setIsLoginModalOpen(false);
+    } catch (error) {
+      console.error('Erro ao fazer cadastro:', error);
+      alert(`Erro ao criar conta: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFormSubmit = async (formData) => {
+    // Se tiver userType, é cadastro, senão é login
+    if (formData.userType) {
+      await handleRegister(formData);
+    } else {
+      await handleLogin(formData);
     }
   };
 
@@ -46,8 +73,9 @@ function Home() {
         onClose={() => setIsLoginModalOpen(false)}
       >
         <LoginForm 
-          onSubmit={handleLogin}
+          onSubmit={handleFormSubmit}
           onClose={() => setIsLoginModalOpen(false)}
+          isLoading={isLoading}
         />
       </Modal>
     </div>

@@ -5,13 +5,14 @@ import Select from '../common/Select/Select';
 import Checkbox from '../common/Checkbox/Checkbox';
 import './LoginForm.css';
 
-function LoginForm({ onSubmit, onClose }) {
+function LoginForm({ onSubmit, onClose, isLoading }) {
   const [activeTab, setActiveTab] = useState('login');
   const [loginData, setLoginData] = useState({
-    email: '',
+    username: '',
     password: ''
   });
   const [signupData, setSignupData] = useState({
+    username: '',
     fullName: '',
     email: '',
     phone: '',
@@ -77,12 +78,12 @@ function LoginForm({ onSubmit, onClose }) {
       {activeTab === 'login' ? (
         <form className="login-form" onSubmit={handleSubmit}>
           <Input
-            type="email"
-            label="Email"
-            name="email"
-            value={loginData.email}
+            type="text"
+            label="Username"
+            name="username"
+            value={loginData.username}
             onChange={handleLoginChange}
-            placeholder="seu@email.com"
+            placeholder="Seu username"
             required
           />
           <Input
@@ -94,12 +95,21 @@ function LoginForm({ onSubmit, onClose }) {
             placeholder="Sua senha"
             required
           />
-          <Button type="submit" variant="primary">
-            Entrar
+          <Button type="submit" variant="primary" disabled={isLoading}>
+            {isLoading ? 'Entrando...' : 'Entrar'}
           </Button>
         </form>
       ) : (
         <form className="login-form" onSubmit={handleSubmit}>
+          <Input
+            type="text"
+            label="Username"
+            name="username"
+            value={signupData.username}
+            onChange={handleSignupChange}
+            placeholder="Escolha um username"
+            required
+          />
           <Input
             type="text"
             label="Nome Completo"
@@ -155,8 +165,8 @@ function LoginForm({ onSubmit, onClose }) {
             }
             required
           />
-          <Button type="submit" variant="primary">
-            Criar Conta
+          <Button type="submit" variant="primary" disabled={isLoading}>
+            {isLoading ? 'Criando...' : 'Criar Conta'}
           </Button>
         </form>
       )}

@@ -91,11 +91,19 @@ function Home() {
     }
   };
 
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+    setIsLoginModalOpen(true);
+  };
+
   return (
     <div className="home-page">
       <Header 
         onLoginClick={() => setIsLoginModalOpen(true)}
         onProfileClick={() => setIsProfileModalOpen(true)}
+        user={user}
+        onLogout={handleLogout}
       />
       
       <main className="home-content">

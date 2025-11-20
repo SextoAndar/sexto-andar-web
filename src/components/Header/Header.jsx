@@ -3,19 +3,11 @@ import { Link } from 'react-router-dom';
 import authService from '../../services/authService';
 import './Header.css';
 
-function Header({ onLoginClick, onProfileClick }) {
-  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    // Verifica se há usuário logado ao carregar
-    const currentUser = authService.getUser();
-    setUser(currentUser);
-  }, []);
-
+function Header({ onLoginClick, onProfileClick, user, onLogout }) {
   const handleLogout = async () => {
     await authService.logout();
-    setUser(null);
-    window.location.reload();
+    if (onLogout) onLogout();
   };
 
   const getProfilePictureUrl = (userId, hasProfilePicture) => {
@@ -67,6 +59,7 @@ function Header({ onLoginClick, onProfileClick }) {
                 onError={(e) => e.target.src = '/default-pp.png'}
               />
             </button>
+            <button className="header-logout-btn" onClick={handleLogout} title="Sair">Sair</button>
           </div>
         ) : (
           <button className="header-login-btn" onClick={onLoginClick}>

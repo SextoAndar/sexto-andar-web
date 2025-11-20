@@ -1,0 +1,23 @@
+.properties-list-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.properties-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem 0.5rem;
+  justify-content: center;
+  align-items: flex-start;
+}
+.properties-list-loading,
+.properties-list-error {
+  color: #00a868;
+  font-size: 1.2rem;
+  text-align: center;
+  margin: 2rem 0;
+}

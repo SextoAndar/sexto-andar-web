@@ -4,6 +4,7 @@ import Modal from '../../components/common/Modal/Modal';
 import LoginForm from '../../components/LoginForm/LoginForm';
 import ProfileModal from '../../components/ProfileModal/ProfileModal';
 import authService from '../../services/authService';
+import PropertiesList from '../PropertiesList/PropertiesList';
 import './Home.css';
 
 function Home() {
@@ -85,6 +86,8 @@ function Home() {
             <button className="search-button">Buscar Imóveis</button>
           </div>
         </section>
+
+        <PropertiesList />
       </main>
 
       <Modal 

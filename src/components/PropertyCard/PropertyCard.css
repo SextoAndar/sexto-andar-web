@@ -1,0 +1,92 @@
+.property-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  overflow: hidden;
+  width: 320px;
+  margin: 0 12px 32px 0;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s;
+}
+.property-card:hover {
+  box-shadow: 0 4px 16px rgba(0,168,104,0.12);
+}
+.property-card-header {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem 1rem 0 1rem;
+}
+.tag {
+  background: #e8f5f1;
+  color: #00a868;
+  border-radius: 8px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.property-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin: 0.5rem 0;
+}
+.property-card-body {
+  padding: 0 1rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.property-rating {
+  color: #f7b500;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.property-price {
+  color: #00a868;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+.property-cond {
+  color: #888;
+  font-size: 0.95rem;
+  margin-left: 0.5rem;
+}
+.property-title {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #222;
+  margin-bottom: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.property-address {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 0.2rem;
+}
+.property-features {
+  display: flex;
+  gap: 1.2rem;
+  color: #444;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+.property-details-btn {
+  background: #00a868;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+.property-details-btn:hover {
+  background: #008c56;
+}

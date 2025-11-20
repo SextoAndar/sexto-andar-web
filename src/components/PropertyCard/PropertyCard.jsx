@@ -1,10 +1,17 @@
+
+
 import './PropertyCard.css';
 
-function PropertyCard({ property }) {
+
+function PropertyCard({ property, onDetails }) {
   const primaryImage = property.images?.find(img => img.is_primary) || property.images?.[0];
   const imgUrl = primaryImage
     ? `http://localhost:8000/api/images/${primaryImage.id}`
     : '/default-property.jpg';
+
+  const handleDetails = () => {
+    if (onDetails) onDetails(property.id);
+  };
 
   return (
     <div className="property-card">
@@ -31,7 +38,7 @@ function PropertyCard({ property }) {
           <span>🛁 {property.bathrooms}</span>
           <span>📐 {property.propertySize}m²</span>
         </div>
-        <button className="property-details-btn">Ver Detalhes</button>
+        <button className="property-details-btn" onClick={handleDetails}>Ver Detalhes</button>
       </div>
     </div>
   );

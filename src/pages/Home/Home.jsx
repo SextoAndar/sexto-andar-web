@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '../../components/Header/Header';
 import Modal from '../../components/common/Modal/Modal';
 import LoginForm from '../../components/LoginForm/LoginForm';
@@ -12,7 +12,29 @@ function Home() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const user = authService.getUser();
+  const [user, setUser] = useState(authService.getUser());
+  // Checa sessão ao carregar o app
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch('/api/auth/me', { credentials: 'include' });
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+          localStorage.setItem('user', JSON.stringify(userData));
+        } else {
+          setUser(null);
+          localStorage.removeItem('user');
+          setIsLoginModalOpen(true);
+        }
+      } catch (err) {
+        setUser(null);
+        localStorage.removeItem('user');
+        setIsLoginModalOpen(true);
+      }
+    };
+    checkSession();
+  }, []);
 
   const handleLogin = async (formData) => {
     setIsLoading(true);
@@ -21,7 +43,9 @@ function Home() {
       console.log('Login realizado com sucesso:', response.user);
       alert(`Bem-vindo(a), ${response.user.fullName}!`);
       setIsLoginModalOpen(false);
-      window.location.reload(); // Recarrega para atualizar o header
+      // Atualiza user após login
+      const me = await authService.getMe();
+      setUser(me);
     } catch (error) {
       console.error('Erro ao fazer login:', error);
       alert(`Erro ao fazer login: ${error.message}`);
@@ -47,7 +71,9 @@ function Home() {
       const userName = loginResponse.user?.fullName || loginResponse.user?.username || 'usuário';
       alert(`Conta criada com sucesso! Bem-vindo(a), ${userName}!`);
       setIsLoginModalOpen(false);
-      window.location.reload(); // Recarrega para atualizar o header
+      // Atualiza user após cadastro/login
+      const me = await authService.getMe();
+      setUser(me);
     } catch (error) {
       console.error('Erro ao fazer cadastro:', error);
       alert(`Erro ao criar conta: ${error.message}`);

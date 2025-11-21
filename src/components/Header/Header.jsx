@@ -28,15 +28,15 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
         </div>
 
         <nav className="header-nav">
-          {/* Alugar: só aparece se não for proprietário */}
-          {(!user || user.role !== 'Proprietário') && (
+          {/* Alugar: só aparece se não for PROPERTY_OWNER */}
+          {(!user || (user.role !== 'PROPERTY_OWNER' && user.role !== 'ADMIN')) && (
             <a href="#" className="nav-link">
               <span className="nav-icon">🏠</span>
               Alugar
             </a>
           )}
-          {/* Anunciar: só aparece se não for usuário comum */}
-          {(!user || user.role !== 'Usuário') && (
+          {/* Anunciar: só aparece se não for USER */}
+          {(!user || (user.role !== 'USER' && user.role !== 'ADMIN')) && (
             <a href="#" className="nav-link">
               <span className="nav-icon">➕</span>
               Anunciar
@@ -46,8 +46,8 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
             <span className="nav-icon">🔍</span>
             Buscar
           </a>
-          {/* Favoritos: só aparece se for usuário comum */}
-          {user && user.role === 'Usuário' && (
+          {/* Favoritos: só aparece se for USER */}
+          {user && user.role === 'USER' && (
             <a href="#" className="nav-link">
               <span className="nav-icon">❤️</span>
               Favoritos

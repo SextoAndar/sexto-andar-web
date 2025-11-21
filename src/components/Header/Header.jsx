@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import authService from '../../services/authService';
 import './Header.css';
 import PropertyRegisterModal from '../PropertyRegisterModal/PropertyRegisterModal';
+import OwnerPropertiesModal from '../OwnerPropertiesModal/OwnerPropertiesModal';
 
 
 function Header({ onLoginClick, onProfileClick, user, onLogout }) {
@@ -18,7 +19,7 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
     return '/default-pp.png';
   };
 
-  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+        const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   const handleAnnounceClick = (e) => {
     e.preventDefault();
@@ -57,6 +58,12 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
               Anunciar
             </a>
           )}
+          {/* Minhas propriedades: só para PROPERTY_OWNER */}
+                {user && user.role === 'PROPERTY_OWNER' && (
+                  <button className="owner-properties-btn">
+                    Minhas Propriedades
+                  </button>
+                )}
           <a href="#" className="nav-link">
             <span className="nav-icon">🔍</span>
             Buscar
@@ -90,7 +97,7 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
         )}
       </div>
     </header>
-    <PropertyRegisterModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} />
+          <PropertyRegisterModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} />
     </>
   );
 }

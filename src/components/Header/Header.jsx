@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import authService from '../../services/authService';
 import './Header.css';
+import PropertyRegisterModal from '../PropertyRegisterModal/PropertyRegisterModal';
 
 
 function Header({ onLoginClick, onProfileClick, user, onLogout }) {
@@ -17,7 +18,21 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
     return '/default-pp.png';
   };
 
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+
+  const handleAnnounceClick = (e) => {
+    e.preventDefault();
+    if (!user) {
+      if (onLoginClick) onLoginClick();
+      return;
+    }
+    if (user.role === 'PROPERTY_OWNER') {
+      setIsRegisterModalOpen(true);
+    }
+  };
+
   return (
+    <>
     <header className="header">
       <div className="header-container">
         <div className="header-logo">
@@ -37,7 +52,7 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
           )}
           {/* Anunciar: só aparece se não for USER */}
           {(!user || (user.role !== 'USER' && user.role !== 'ADMIN')) && (
-            <a href="#" className="nav-link">
+            <a href="#" className="nav-link" onClick={handleAnnounceClick}>
               <span className="nav-icon">➕</span>
               Anunciar
             </a>
@@ -75,6 +90,8 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
         )}
       </div>
     </header>
+    <PropertyRegisterModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} />
+    </>
   );
 }
 

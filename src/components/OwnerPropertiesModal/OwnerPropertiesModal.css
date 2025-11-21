@@ -1,0 +1,10 @@
+.owner-properties-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem 0.5rem;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}

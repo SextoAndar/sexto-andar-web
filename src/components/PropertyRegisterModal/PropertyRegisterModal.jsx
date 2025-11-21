@@ -61,11 +61,91 @@ const PropertyRegisterModal = ({ isOpen, onClose }) => {
     setImageFiles(Array.from(e.target.files));
   };
 
+  // Validação dos campos
+  function validateForm() {
+    const errors = [];
+    // Endereço
+    if (!form.address.street || form.address.street.length < 3 || form.address.street.length > 200) {
+      errors.push('Rua: mínimo 3, máximo 200 caracteres.');
+    }
+    if (!form.address.number || form.address.number.length < 1 || form.address.number.length > 20) {
+      errors.push('Número: mínimo 1, máximo 20 caracteres.');
+    }
+    if (!form.address.city || form.address.city.length < 2 || form.address.city.length > 100) {
+      errors.push('Cidade: mínimo 2, máximo 100 caracteres.');
+    }
+    if (!/^[0-9]{8}$/.test(form.address.postal_code)) {
+      errors.push('CEP: deve conter exatamente 8 dígitos numéricos.');
+    }
+    if (!form.address.country || form.address.country.length > 100) {
+      errors.push('País: máximo 100 caracteres.');
+    }
+    // Imagens
+    if (imageFiles.length < 1 || imageFiles.length > 15) {
+      errors.push('Envie de 1 a 15 imagens.');
+    }
+    imageFiles.forEach((file, idx) => {
+      if (!['image/jpeg','image/jpg','image/png','image/webp'].includes(file.type)) {
+        errors.push(`Imagem ${idx+1}: formato não suportado.`);
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        errors.push(`Imagem ${idx+1}: tamanho máximo 5MB.`);
+      }
+    });
+    // Apartamento
+    if (form.propertyType === 'apartment') {
+      if (!form.propertySize || isNaN(form.propertySize) || Number(form.propertySize) <= 0) {
+        errors.push('Tamanho: obrigatório, maior que 0.');
+      }
+      if (!form.description || form.description.length < 10 || form.description.length > 1000) {
+        errors.push('Descrição: mínimo 10, máximo 1000 caracteres.');
+      }
+      // propertyValue
+      const propertyValue = Number(form.propertyValue);
+      if (!form.propertyValue || isNaN(propertyValue) || propertyValue < 0.01 || propertyValue > 99999999.99) {
+        errors.push('Valor: obrigatório, entre 0.01 e 99.999.999,99.');
+      }
+      if (!['rent','sale'].includes(form.salesType)) {
+        errors.push('Venda/Aluguel: selecione uma opção válida.');
+      }
+      // condominiumFee
+      const condominiumFee = Number(form.condominiumFee);
+      if (form.condominiumFee === '' || isNaN(condominiumFee) || condominiumFee < 0 || condominiumFee > 99999999.99) {
+        errors.push('Condomínio: obrigatório, entre 0 e 99.999.999,99.');
+      }
+      if (form.commonArea === undefined) {
+        errors.push('Área comum: obrigatório.');
+      }
+      if (form.floor === '' || isNaN(form.floor) || Number(form.floor) < -10 || Number(form.floor) > 200) {
+        errors.push('Andar: obrigatório, de -10 até 200.');
+      }
+      if (form.isPetAllowed === undefined) {
+        errors.push('Permite pets: obrigatório.');
+      }
+    }
+    // Casa
+    if (form.propertyType === 'house') {
+      const landPrice = Number(form.landPrice);
+      if (!form.landPrice || isNaN(landPrice) || landPrice < 0.01 || landPrice > 99999999.99) {
+        errors.push('Preço do terreno: obrigatório, entre 0.01 e 99.999.999,99.');
+      }
+      if (form.isSingleHouse === undefined) {
+        errors.push('Casa única: obrigatório.');
+      }
+    }
+    return errors;
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
     setSuccess(null);
+    const validationErrors = validateForm();
+    if (validationErrors.length > 0) {
+      setError(validationErrors.join(' '));
+      return;
+    }
+    setLoading(true);
     try {
       // Converte imagens para base64
       const images = await Promise.all(imageFiles.map(async (file, idx) => ({
@@ -101,7 +181,11 @@ const PropertyRegisterModal = ({ isOpen, onClose }) => {
         credentials: 'include',
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error('Erro ao cadastrar imóvel');
+      if (!res.ok) {
+        let msg = 'Erro ao cadastrar imóvel';
+        try { const errJson = await res.json(); msg += ': ' + (errJson.detail || JSON.stringify(errJson)); } catch {}
+        throw new Error(msg);
+      }
       setSuccess('Imóvel cadastrado com sucesso!');
       setForm(initialState);
       setImageFiles([]);
@@ -199,7 +283,16 @@ const PropertyRegisterModal = ({ isOpen, onClose }) => {
           </div>
           <div className="form-row">
             {imageFiles.map((file, idx) => (
-              <span key={idx} style={{ fontSize: 12, marginRight: 8 }}>{file.name}</span>
+              <span key={idx} style={{ fontSize: 12, marginRight: 8 }}>
+                {file.name}
+                {['image/jpeg','image/jpg','image/png','image/webp'].includes(file.type) && (
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="preview"
+                    className="preview"
+                  />
+                )}
+              </span>
             ))}
           </div>
           {error && <div className="form-error">{error}</div>}

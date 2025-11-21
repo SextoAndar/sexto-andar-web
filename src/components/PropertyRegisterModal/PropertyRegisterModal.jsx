@@ -93,8 +93,8 @@ const PropertyRegisterModal = ({ isOpen, onClose }) => {
       }
       // Endpoint
       const endpoint = form.propertyType === 'apartment'
-        ? '/api/properties/apartment'
-        : '/api/properties/house';
+        ? '/api/properties/apartments'
+        : '/api/properties/houses';
       const res = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

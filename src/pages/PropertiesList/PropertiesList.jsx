@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { fetchProperties } from '../../services/propertyService';
 import PropertyCard from '../../components/PropertyCard/PropertyCard';

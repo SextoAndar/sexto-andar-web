@@ -1,7 +1,6 @@
 import React, { useState } from "react";
+import { createProperty } from '../../services/propertyService';
 import './PropertyRegisterModal.css';
-
-const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 function toBase64(file) {
   return new Promise((resolve, reject) => {
@@ -171,21 +170,9 @@ const PropertyRegisterModal = ({ isOpen, onClose }) => {
         delete payload.floor;
         delete payload.isPetAllowed;
       }
-      // Endpoint
-      const endpoint = form.propertyType === 'apartment'
-        ? '/api/properties/apartments'
-        : '/api/properties/houses';
-      const res = await fetch(`${API_URL}${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        let msg = 'Erro ao cadastrar imóvel';
-        try { const errJson = await res.json(); msg += ': ' + (errJson.detail || JSON.stringify(errJson)); } catch {}
-        throw new Error(msg);
-      }
+      
+      await createProperty(payload);
+
       setSuccess('Imóvel cadastrado com sucesso!');
       setForm(initialState);
       setImageFiles([]);

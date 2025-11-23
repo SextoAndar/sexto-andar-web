@@ -9,7 +9,7 @@ function ProfileModal({ user, onClose }) {
   const [currentUser, setCurrentUser] = useState(user);
   const [imgSrc, setImgSrc] = useState(
     user.hasProfilePicture
-      ? `http://localhost:8001/auth/profile/picture/${user.id}`
+      ? `/auth/v1/auth/profile/picture/${user.id}`
       : '/default-pp.png'
   );
   const [isUploading, setIsUploading] = useState(false);
@@ -46,7 +46,7 @@ function ProfileModal({ user, onClose }) {
   // Atualiza preview da foto
   const refreshProfilePicture = (hasProfilePicture) => {
     if (hasProfilePicture) {
-      setImgSrc(`http://localhost:8001/auth/profile/picture/${currentUser.id}?t=${Date.now()}`);
+      setImgSrc(`/auth/v1/auth/profile/picture/${currentUser.id}?t=${Date.now()}`);
     } else {
       setImgSrc('/default-pp.png');
     }
@@ -192,7 +192,6 @@ function ProfileModal({ user, onClose }) {
           </div>
 
           <div className="profile-actions">
-            <button className="action-btn secondary">⚙️ Configurações</button>
             <button className="action-btn secondary">🔔 Notificações</button>
             <button className="action-btn danger" onClick={handleLogout}>🚪 Sair</button>
           </div>
@@ -240,22 +239,6 @@ function ProfileModal({ user, onClose }) {
                 <button className="action-btn secondary" onClick={() => setIsEditing(true)}>
                   ✏️ Editar Perfil
                 </button>
-                <button
-                  className="action-btn secondary"
-                  onClick={() => fileInputRef.current && fileInputRef.current.click()}
-                  disabled={isUploading}
-                >
-                  📸 {isUploading ? 'Enviando...' : 'Alterar Foto'}
-                </button>
-                {currentUser.hasProfilePicture && (
-                  <button
-                    className="action-btn danger"
-                    onClick={handleDeletePhoto}
-                    disabled={isUploading}
-                  >
-                    Remover Foto
-                  </button>
-                )}
               </div>
             </>
           )}

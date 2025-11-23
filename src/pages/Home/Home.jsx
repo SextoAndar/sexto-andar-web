@@ -13,24 +13,16 @@ function Home() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [user, setUser] = useState(authService.getUser());
-  // Checa sessão ao carregar o app
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch('/api/auth/me', { credentials: 'include' });
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-          localStorage.setItem('user', JSON.stringify(userData));
-        } else {
-          setUser(null);
-          localStorage.removeItem('user');
-          setIsLoginModalOpen(true);
-        }
+        const userData = await authService.getMe();
+        setUser(userData);
       } catch (err) {
+        authService.logout();
+        // Não abre o modal de login automaticamente ao carregar a página
+        // Apenas garante que o usuário esteja deslogado
         setUser(null);
-        localStorage.removeItem('user');
-        setIsLoginModalOpen(true);
       }
     };
     checkSession();

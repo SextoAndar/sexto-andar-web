@@ -1,6 +1,6 @@
 // Serviço de autenticação integrado com sexto-andar-auth
 // Usa proxy do Vite para evitar problemas com cookies cross-origin
-const API_URL = '/api/auth';
+const API_URL = '/auth/v1/auth';
 
 export const authService = {
     // Upload de foto de perfil
@@ -55,33 +55,21 @@ export const authService = {
       console.log('📡 Status do login:', response.status);
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || 'Falha na autenticação');
+        // Tenta ler o erro como JSON, mas se falhar, usa o status text
+        try {
+          const error = await response.json();
+          throw new Error(error.detail || `Erro ${response.status}`);
+        } catch (e) {
+          throw new Error(response.statusText || `Erro ${response.status}`);
+        }
       }
 
       const data = await response.json();
       console.log('✅ Login bem-sucedido! Dados recebidos:', data);
       
-      // Salva dados do usuário no localStorage
       if (data.user) {
         localStorage.setItem('user', JSON.stringify(data.user));
         console.log('💾 Usuário salvo no localStorage');
-      } else {
-        console.warn('⚠️ Resposta não contém data.user:', data);
-      }
-
-      // Verifica se cookie foi recebido testando /me
-      console.log('🔍 Verificando se cookie foi salvo...');
-      const meResponse = await fetch(`${API_URL}/me`, {
-        method: 'GET',
-        credentials: 'include',
-      });
-      console.log('📡 Status /me após login:', meResponse.status);
-      
-      if (meResponse.ok) {
-        console.log('✅ Cookie funcionando! Autenticação OK');
-      } else {
-        console.error('❌ Cookie NÃO foi salvo! Status:', meResponse.status);
       }
 
       return data;
@@ -94,7 +82,6 @@ export const authService = {
   // Cadastro
   async register(userData) {
     try {
-      // Define o endpoint baseado no tipo de usuário
       const endpoint = userData.userType === 'Proprietário' 
         ? `${API_URL}/register/property-owner`
         : `${API_URL}/register/user`;
@@ -120,11 +107,8 @@ export const authService = {
       }
 
       const data = await response.json();
-      
-      // API retorna o usuário diretamente (AuthUser)
       localStorage.setItem('user', JSON.stringify(data));
-
-      return { user: data }; // Normaliza o retorno
+      return { user: data };
     } catch (error) {
       console.error('Erro no cadastro:', error);
       throw error;
@@ -136,7 +120,7 @@ export const authService = {
     try {
       const response = await fetch(`${API_URL}/me`, {
         method: 'GET',
-        credentials: 'include', // Envia o cookie automaticamente
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -169,33 +153,18 @@ export const authService = {
   // Atualizar perfil
   async updateProfile(profileData) {
     try {
-      console.log('📝 Tentando atualizar perfil...');
-      console.log('🍪 Documento cookies:', document.cookie);
-      
       const response = await fetch(`${API_URL}/profile`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify(profileData),
       });
 
-      console.log('📡 Status atualização:', response.status);
-      console.log('📋 Headers da resposta:', [...response.headers.entries()]);
-
       if (!response.ok) {
         const error = await response.json();
-        console.error('❌ Erro ao atualizar:', error);
-        
-        // Se erro 401, sessão expirou
         if (response.status === 401) {
-          console.error('❌ 401 = Cookie não enviado ou inválido!');
-          console.log('🔍 Verifique: DevTools → Application → Cookies → localhost:8001');
-          localStorage.removeItem('user');
           throw new Error('SESSION_EXPIRED');
         }
-        
         throw new Error(error.detail || 'Falha ao atualizar perfil');
       }
 
@@ -208,18 +177,15 @@ export const authService = {
     }
   },
 
-  // Verifica se está autenticado
   isAuthenticated() {
     return !!this.getUser();
   },
 
-  // Retorna usuário do localStorage
   getUser() {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
   },
 
-  // Verifica role do usuário
   getUserRole() {
     const user = this.getUser();
     return user ? user.role : null;

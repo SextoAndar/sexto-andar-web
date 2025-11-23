@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { fetchPropertyById } from '../../services/propertyService';
 import './PropertyDetailsModal.css';
-
-const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 const PropertyDetailsModal = ({ propertyId, isOpen, onClose }) => {
   const [property, setProperty] = useState(null);
@@ -9,17 +8,14 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!isOpen) return;
-    setLoading(true);
-    setError(null);
-    setProperty(null);
-    const fetchProperty = async () => {
+    if (!isOpen || !propertyId) return;
+    
+    const getPropertyDetails = async () => {
+      setLoading(true);
+      setError(null);
+      setProperty(null);
       try {
-        const res = await fetch(`${API_URL}/api/properties/${propertyId}`, {
-          credentials: "include",
-        });
-        if (!res.ok) throw new Error("Erro ao buscar imóvel");
-        const data = await res.json();
+        const data = await fetchPropertyById(propertyId);
         setProperty(data);
       } catch (err) {
         setError(err.message);
@@ -27,7 +23,8 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose }) => {
         setLoading(false);
       }
     };
-    fetchProperty();
+    
+    getPropertyDetails();
   }, [propertyId, isOpen]);
 
   if (!isOpen) return null;
@@ -46,7 +43,7 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose }) => {
                 {property.images.map((image) => (
                   <img
                     key={image.id}
-                    src={`${API_URL}/api/images/${image.id}`}
+                    src={`/api/api/images/${image.id}`}
                     alt="Foto do imóvel"
                     style={{ maxWidth: 220, margin: 6, borderRadius: 8 }}
                   />

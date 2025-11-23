@@ -18,7 +18,7 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
 
   const getProfilePictureUrl = (userId, hasProfilePicture) => {
     if (hasProfilePicture) {
-      return `http://localhost:8001/auth/profile/picture/${userId}`;
+      return `/auth/v1/auth/profile/picture/${userId}`; // Corrected path
     }
     return '/default-pp.png';
   };
@@ -41,7 +41,8 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
       setIsOwnerPropertiesModalOpen(true);
     } catch (error) {
       console.error(error.message);
-      // Aqui você poderia, por exemplo, mostrar uma notificação de erro para o usuário
+      // Handles errors like 401 or other network issues.
+      alert(`Ocorreu um erro ao buscar suas propriedades: ${error.message}`);
     }
   };
 

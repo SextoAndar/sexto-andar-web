@@ -38,3 +38,17 @@
   margin: 7px 0;
   font-size: 1.05rem;
 }
+
+.property-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.favorite-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}

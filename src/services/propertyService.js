@@ -23,8 +23,12 @@ export async function fetchOwnerProperties() {
   return await res.json();
 }
 
-export async function fetchPropertyById(propertyId) {
-  const res = await fetch(`/api/api/properties/${propertyId}`);
+export async function fetchPropertyById(propertyId, user) {
+  const options = {};
+  if (user) {
+    options.credentials = 'include';
+  }
+  const res = await fetch(`/api/api/properties/${propertyId}`, options);
   if (!res.ok) {
     throw new Error('Erro ao buscar os detalhes da propriedade');
   }
@@ -54,5 +58,72 @@ export async function createProperty(payload) {
     throw new Error(msg);
   }
   return await res.json();
+}
+
+export async function updateProperty(propertyId, data) {
+  const res = await fetch(`/api/api/properties/${propertyId}`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Erro ao atualizar propriedade');
+  return await res.json();
+}
+
+export async function addImage(propertyId, imageData) {
+  const res = await fetch(`/api/api/properties/${propertyId}/images`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(imageData),
+  });
+  if (!res.ok) throw new Error('Erro ao adicionar imagem');
+  return await res.json();
+}
+
+export async function deleteImage(imageId) {
+  const res = await fetch(`/api/api/images/${imageId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Erro ao apagar imagem');
+}
+
+export async function reorderImages(propertyId, imageOrders) {
+  const res = await fetch(`/api/api/properties/${propertyId}/images/reorder`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image_orders: imageOrders }),
+  });
+  if (!res.ok) throw new Error('Erro ao reordenar imagens');
+  return await res.json();
+}
+
+export async function setPrimaryImage(propertyId, imageId) {
+  const res = await fetch(`/api/api/properties/${propertyId}/images/${imageId}/set-primary`, {
+    method: 'PUT',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Erro ao definir imagem principal');
+  return await res.json();
+}
+
+export async function favoriteProperty(propertyId) {
+  const res = await fetch(`/api/api/favorites/${propertyId}`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Erro ao favoritar propriedade');
+  return await res.json();
+}
+
+export async function unfavoriteProperty(propertyId) {
+  const res = await fetch(`/api/api/favorites/${propertyId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Erro ao desfavoritar propriedade');
 }
 

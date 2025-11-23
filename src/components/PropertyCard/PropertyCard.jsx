@@ -3,7 +3,7 @@
 import './PropertyCard.css';
 
 
-function PropertyCard({ property, onDetails }) {
+function PropertyCard({ property, onDetails, onEdit, variant }) {
   const primaryImage = property.images?.find(img => img.is_primary) || property.images?.[0];
   const imgUrl = primaryImage
     ? `http://localhost:8000/api/images/${primaryImage.id}`
@@ -11,6 +11,10 @@ function PropertyCard({ property, onDetails }) {
 
   const handleDetails = () => {
     if (onDetails) onDetails(property.id);
+  };
+
+  const handleEdit = () => {
+    if (onEdit) onEdit(property.id);
   };
 
   return (
@@ -38,7 +42,11 @@ function PropertyCard({ property, onDetails }) {
           <span>🛁 {property.bathrooms}</span>
           <span>📐 {property.propertySize}m²</span>
         </div>
-        <button className="property-details-btn" onClick={handleDetails}>Ver Detalhes</button>
+        {variant === 'edit' ? (
+          <button className="property-edit-btn" onClick={handleEdit}>Editar Imóvel</button>
+        ) : (
+          <button className="property-details-btn" onClick={handleDetails}>Ver Detalhes</button>
+        )}
       </div>
     </div>
   );

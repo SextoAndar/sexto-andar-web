@@ -90,3 +90,19 @@
 .property-details-btn:hover {
   background: #008c56;
 }
+.property-edit-btn {
+  background: #f7b500;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+.property-edit-btn:hover {
+  background: #d99e00;
+}
+

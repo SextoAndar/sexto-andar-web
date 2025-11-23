@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { fetchPropertyById } from '../../services/propertyService';
+import { fetchPropertyById, favoriteProperty, unfavoriteProperty } from '../../services/propertyService';
 import './PropertyDetailsModal.css';
 
-const PropertyDetailsModal = ({ propertyId, isOpen, onClose }) => {
+const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   useEffect(() => {
     if (!isOpen || !propertyId) return;
@@ -15,8 +16,9 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose }) => {
       setError(null);
       setProperty(null);
       try {
-        const data = await fetchPropertyById(propertyId);
+        const data = await fetchPropertyById(propertyId, user); // Pass user to service
         setProperty(data);
+        setIsFavorited(data.is_favorited || false);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -25,7 +27,21 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose }) => {
     };
     
     getPropertyDetails();
-  }, [propertyId, isOpen]);
+  }, [propertyId, isOpen, user]);
+
+  const handleFavorite = async () => {
+    try {
+      if (isFavorited) {
+        await unfavoriteProperty(propertyId);
+        setIsFavorited(false);
+      } else {
+        await favoriteProperty(propertyId);
+        setIsFavorited(true);
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -37,7 +53,17 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose }) => {
         {error && <div>Erro: {error}</div>}
         {property && (
           <>
-            <h2>Detalhes do Imóvel</h2>
+            <div className="property-details-header">
+              <h2>Detalhes do Imóvel</h2>
+              {user && user.role === 'USER' && (
+                <button 
+                  className={`favorite-btn ${isFavorited ? 'favorited' : ''}`}
+                  onClick={handleFavorite}
+                >
+                  {isFavorited ? '❤️' : '🤍'}
+                </button>
+              )}
+            </div>
             {property.images && property.images.length > 0 && (
               <div className="property-images">
                 {property.images.map((image) => (

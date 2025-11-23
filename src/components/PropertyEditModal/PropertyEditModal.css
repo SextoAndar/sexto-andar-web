@@ -1,0 +1,102 @@
+.property-edit-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.property-edit-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.property-edit-form input,
+.property-edit-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.property-edit-form .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+
+
+/* Image Management */
+.image-management {
+  margin-top: 2rem;
+  border-top: 1px solid #eee;
+  padding-top: 1.5rem;
+}
+.image-management h4 {
+  margin-bottom: 1rem;
+}
+.current-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.img-container {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid transparent;
+}
+.img-container.primary {
+  border-color: #f7b500;
+}
+.img-container img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+.img-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  gap: 0.2rem;
+  padding: 0.2rem;
+}
+.img-actions button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.form-error {
+  color: #f44336;
+  margin-bottom: 1rem;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+.form-row .form-group {
+  flex: 1;
+}
+
+.new-images-preview {
+  margin-top: 1.5rem;
+}
+
+.new-images-preview h5 {
+  margin-bottom: 1rem;
+}
+
+.new-images-preview .btn {
+  margin-top: 1rem;
+}

@@ -4,7 +4,7 @@ import PropertyCard from '../../components/PropertyCard/PropertyCard';
 import PropertyDetailsModal from '../../components/PropertyDetailsModal/PropertyDetailsModal';
 import './PropertiesList.css';
 
-export default function PropertiesList() {
+export default function PropertiesList({ user }) {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -42,6 +42,7 @@ export default function PropertiesList() {
         propertyId={selectedPropertyId} 
         isOpen={isDetailsOpen} 
         onClose={handleCloseDetails} 
+        user={user}
       />
     </div>
   );

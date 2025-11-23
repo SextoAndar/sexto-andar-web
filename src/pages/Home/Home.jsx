@@ -113,7 +113,7 @@ function Home() {
           </div>
         </section>
 
-        <PropertiesList />
+        <PropertiesList user={user} />
       </main>
 
       <Modal 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchPropertyById, favoriteProperty, unfavoriteProperty } from '../../services/propertyService';
+import { fetchPropertyById, favoriteProperty, unfavoriteProperty, getFavoriteStatus } from '../../services/propertyService';
 import './PropertyDetailsModal.css';
 
 const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
@@ -11,14 +11,18 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
   useEffect(() => {
     if (!isOpen || !propertyId) return;
     
-    const getPropertyDetails = async () => {
+    const getDetails = async () => {
       setLoading(true);
       setError(null);
       setProperty(null);
       try {
-        const data = await fetchPropertyById(propertyId, user); // Pass user to service
-        setProperty(data);
-        setIsFavorited(data.is_favorited || false);
+        const propertyData = await fetchPropertyById(propertyId);
+        setProperty(propertyData);
+
+        if (user && user.role === 'USER') {
+          const favoriteStatus = await getFavoriteStatus(propertyId);
+          setIsFavorited(favoriteStatus.is_favorited);
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -26,7 +30,7 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
       }
     };
     
-    getPropertyDetails();
+    getDetails();
   }, [propertyId, isOpen, user]);
 
   const handleFavorite = async () => {

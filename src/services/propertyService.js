@@ -23,14 +23,25 @@ export async function fetchOwnerProperties() {
   return await res.json();
 }
 
-export async function fetchPropertyById(propertyId, user) {
-  const options = {};
-  if (user) {
-    options.credentials = 'include';
-  }
-  const res = await fetch(`/api/api/properties/${propertyId}`, options);
+export async function fetchPropertyById(propertyId) {
+  const res = await fetch(`/api/api/properties/${propertyId}`);
   if (!res.ok) {
     throw new Error('Erro ao buscar os detalhes da propriedade');
+  }
+  return await res.json();
+}
+
+export async function getFavoriteStatus(propertyId) {
+  const res = await fetch(`/api/api/favorites/${propertyId}/status`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+  if (!res.ok) {
+    // A 404 here might just mean it's not favorited, so we don't throw.
+    if (res.status === 404) {
+      return { is_favorited: false };
+    }
+    throw new Error('Erro ao verificar status de favorito');
   }
   return await res.json();
 }
@@ -125,5 +136,19 @@ export async function unfavoriteProperty(propertyId) {
     credentials: 'include',
   });
   if (!res.ok) throw new Error('Erro ao desfavoritar propriedade');
+}
+
+export async function fetchFavoriteProperties({ page = 1, size = 10, active_only = true } = {}) {
+  const url = new URL('/api/api/favorites/', window.location.origin);
+  url.searchParams.set('page', page);
+  url.searchParams.set('size', size);
+  url.searchParams.set('active_only', active_only);
+  
+  const res = await fetch(url.toString(), {
+    method: 'GET',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Erro ao buscar propriedades favoritas');
+  return await res.json();
 }
 

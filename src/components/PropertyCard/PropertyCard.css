@@ -106,3 +106,29 @@
   background: #d99e00;
 }
 
+.property-unfavorite-btn {
+  background: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+
+.property-unfavorite-btn:hover {
+  background: #d32f2f;
+}
+
+.property-card-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.property-card-actions > button {
+  width: 50%;
+}
+

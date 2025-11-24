@@ -85,6 +85,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             onChange={handleLoginChange}
             placeholder="Seu username"
             required
+            autoComplete="username"
           />
           <Input
             type="password"
@@ -94,6 +95,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             onChange={handleLoginChange}
             placeholder="Sua senha"
             required
+            autoComplete="current-password"
           />
           <Button type="submit" variant="primary" disabled={isLoading}>
             {isLoading ? 'Entrando...' : 'Entrar'}
@@ -109,6 +111,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             onChange={handleSignupChange}
             placeholder="Escolha um username"
             required
+            autoComplete="username"
           />
           <Input
             type="text"
@@ -153,6 +156,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             onChange={handleSignupChange}
             placeholder="Crie uma senha segura"
             required
+            autoComplete="new-password"
           />
           <Checkbox
             name="acceptTerms"

@@ -3,10 +3,10 @@
 import './PropertyCard.css';
 
 
-function PropertyCard({ property, onDetails, onEdit, variant }) {
+function PropertyCard({ property, onDetails, onEdit, onUnfavorite, variant }) {
   const primaryImage = property.images?.find(img => img.is_primary) || property.images?.[0];
   const imgUrl = primaryImage
-    ? `http://localhost:8000/api/images/${primaryImage.id}`
+    ? `/api/api/images/${primaryImage.id}`
     : '/default-property.jpg';
 
   const handleDetails = () => {
@@ -15,6 +15,10 @@ function PropertyCard({ property, onDetails, onEdit, variant }) {
 
   const handleEdit = () => {
     if (onEdit) onEdit(property.id);
+  };
+
+  const handleUnfavorite = () => {
+    if (onUnfavorite) onUnfavorite(property.id);
   };
 
   return (
@@ -44,6 +48,11 @@ function PropertyCard({ property, onDetails, onEdit, variant }) {
         </div>
         {variant === 'edit' ? (
           <button className="property-edit-btn" onClick={handleEdit}>Editar Imóvel</button>
+        ) : variant === 'unfavorite' ? (
+          <div className="property-card-actions">
+            <button className="property-unfavorite-btn" onClick={handleUnfavorite}>Desfavoritar</button>
+            <button className="property-details-btn" onClick={handleDetails}>Ver Detalhes</button>
+          </div>
         ) : (
           <button className="property-details-btn" onClick={handleDetails}>Ver Detalhes</button>
         )}

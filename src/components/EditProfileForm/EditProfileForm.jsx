@@ -123,6 +123,7 @@ function EditProfileForm({ user, onSave, onCancel }) {
             onChange={handleChange}
             placeholder="Digite sua senha atual"
             required={needsPassword}
+            autoComplete="current-password"
           />
         )}
 
@@ -133,6 +134,7 @@ function EditProfileForm({ user, onSave, onCancel }) {
           value={formData.newPassword}
           onChange={handleChange}
           placeholder="Deixe em branco para não alterar"
+          autoComplete="new-password"
         />
 
         {formData.newPassword && (
@@ -144,6 +146,7 @@ function EditProfileForm({ user, onSave, onCancel }) {
             onChange={handleChange}
             placeholder="Digite a nova senha novamente"
             required
+            autoComplete="new-password"
           />
         )}
       </div>

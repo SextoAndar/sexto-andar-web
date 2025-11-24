@@ -5,10 +5,12 @@ import { fetchOwnerProperties } from '../../services/propertyService';
 import './Header.css';
 import PropertyRegisterModal from '../PropertyRegisterModal/PropertyRegisterModal';
 import OwnerPropertiesModal from '../OwnerPropertiesModal/OwnerPropertiesModal';
+import FavoritesModal from '../FavoritesModal/FavoritesModal';
 
 function Header({ onLoginClick, onProfileClick, user, onLogout }) {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isOwnerPropertiesModalOpen, setIsOwnerPropertiesModalOpen] = useState(false);
+  const [isFavoritesModalOpen, setIsFavoritesModalOpen] = useState(false);
   const [ownerProperties, setOwnerProperties] = useState([]);
 
   const handleLogout = async () => {
@@ -46,6 +48,10 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
     }
   };
 
+  const handleFavoritesClick = () => {
+    setIsFavoritesModalOpen(true);
+  };
+
   return (
     <>
       <header className="header">
@@ -81,7 +87,7 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
               Buscar
             </a>
             {user && user.role === 'USER' && (
-              <a href="#" className="nav-link">
+              <a href="#" className="nav-link" onClick={handleFavoritesClick}>
                 <span className="nav-icon">❤️</span>
                 Favoritos
               </a>
@@ -113,6 +119,11 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
         isOpen={isOwnerPropertiesModalOpen} 
         onClose={() => setIsOwnerPropertiesModalOpen(false)} 
         properties={ownerProperties} 
+      />
+      <FavoritesModal
+        isOpen={isFavoritesModalOpen}
+        onClose={() => setIsFavoritesModalOpen(false)}
+        user={user}
       />
     </>
   );

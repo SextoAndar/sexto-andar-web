@@ -1,12 +1,32 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import authService from '../../services/authService';
+import { getPortfolioStats, getFavoritesCount } from '../../services/propertyService';
 import EditProfileForm from '../EditProfileForm/EditProfileForm';
 import './ProfileModal.css';
+
+const StatCard = ({ icon, label, value }) => (
+  <div className="stat-card">
+    <div className="stat-icon">{icon}</div>
+    <div className="stat-info">
+      <p className="stat-number">{value}</p>
+      <p className="stat-label">{label}</p>
+    </div>
+  </div>
+);
+
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value);
+};
 
 function ProfileModal({ user, onClose }) {
   const [activeTab, setActiveTab] = useState('geral');
   const [isEditing, setIsEditing] = useState(false);
   const [currentUser, setCurrentUser] = useState(user);
+  const [stats, setStats] = useState(null);
+  const [favoritesCount, setFavoritesCount] = useState(0);
   const [imgSrc, setImgSrc] = useState(
     user.hasProfilePicture
       ? `/auth/v1/auth/profile/picture/${user.id}`
@@ -14,6 +34,32 @@ function ProfileModal({ user, onClose }) {
   );
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef();
+
+  useEffect(() => {
+    if (activeTab === 'geral') {
+      if (currentUser.role === 'PROPERTY_OWNER' && !stats) {
+        const fetchStats = async () => {
+          try {
+            const data = await getPortfolioStats();
+            setStats(data);
+          } catch (error) {
+            console.error('Erro ao buscar estatísticas:', error);
+          }
+        };
+        fetchStats();
+      } else if (currentUser.role === 'USER') {
+        const fetchFavoritesCount = async () => {
+          try {
+            const data = await getFavoritesCount();
+            setFavoritesCount(data.count);
+          } catch (error) {
+            console.error('Erro ao buscar contagem de favoritos:', error);
+          }
+        };
+        fetchFavoritesCount();
+      }
+    }
+  }, [activeTab, currentUser.role, stats]);
 
   const handleLogout = async () => {
     await authService.logout();
@@ -28,22 +74,18 @@ function ProfileModal({ user, onClose }) {
       alert('Perfil atualizado com sucesso!');
       window.location.reload(); // Recarrega para atualizar header
     } catch (error) {
-      // Se erro de sessão expirada
       if (error.message === 'SESSION_EXPIRED') {
         alert('Sua sessão expirou. Por favor, faça login novamente.');
         await authService.logout();
         window.location.reload();
         return;
       }
-      
-      // Mostra mensagem de erro amigável
       alert(`Erro ao atualizar perfil: ${error.message}`);
       console.error('Erro detalhado:', error);
     }
   };
 
 
-  // Atualiza preview da foto
   const refreshProfilePicture = (hasProfilePicture) => {
     if (hasProfilePicture) {
       setImgSrc(`/auth/v1/auth/profile/picture/${currentUser.id}?t=${Date.now()}`);
@@ -52,7 +94,6 @@ function ProfileModal({ user, onClose }) {
     }
   };
 
-  // Upload handler
   const handlePhotoChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -78,7 +119,6 @@ function ProfileModal({ user, onClose }) {
     }
   };
 
-  // Remover foto
   const handleDeletePhoto = async () => {
     if (!window.confirm('Remover foto de perfil?')) return;
     setIsUploading(true);
@@ -107,6 +147,28 @@ function ProfileModal({ user, onClose }) {
     };
     return roles[role] || role;
   };
+
+  const renderOwnerStats = () => {
+    if (!stats) return <p>Carregando estatísticas...</p>;
+    return (
+      <div className="profile-stats owner-stats">
+        <StatCard icon="🏢" label="Total de Imóveis" value={stats.total_properties} />
+        <StatCard icon="✅" label="Imóveis Ativos" value={stats.active_properties} />
+        <StatCard icon="🏠" label="Casas" value={stats.total_houses} />
+        <StatCard icon="🏙️" label="Apartamentos" value={stats.total_apartments} />
+        <StatCard icon="💰" label="Valor do Portfólio" value={formatCurrency(stats.total_portfolio_value)} />
+        <StatCard icon="💸" label="Aluguel Potencial" value={formatCurrency(stats.total_monthly_rent_potential)} />
+      </div>
+    );
+  };
+
+  const renderUserStats = () => (
+    <div className="profile-stats">
+      <StatCard icon="❤️" label="Favoritos" value={favoritesCount} />
+      <StatCard icon="📅" label="Visitações" value="3" />
+      <StatCard icon="📊" label="Buscas" value="12" />
+    </div>
+  );
 
   return (
     <div className="profile-modal-content">
@@ -165,31 +227,7 @@ function ProfileModal({ user, onClose }) {
 
       {activeTab === 'geral' && (
         <>
-          <div className="profile-stats">
-            <div className="stat-card">
-              <div className="stat-icon">❤️</div>
-              <div className="stat-info">
-                <p className="stat-number">1</p>
-                <p className="stat-label">Favoritos</p>
-              </div>
-            </div>
-            
-            <div className="stat-card">
-              <div className="stat-icon">📅</div>
-              <div className="stat-info">
-                <p className="stat-number">3</p>
-                <p className="stat-label">Visitações</p>
-              </div>
-            </div>
-            
-            <div className="stat-card">
-              <div className="stat-icon">📊</div>
-              <div className="stat-info">
-                <p className="stat-number">12</p>
-                <p className="stat-label">Buscas</p>
-              </div>
-            </div>
-          </div>
+          {currentUser.role === 'PROPERTY_OWNER' ? renderOwnerStats() : renderUserStats()}
 
           <div className="profile-actions">
             <button className="action-btn secondary">🔔 Notificações</button>
@@ -244,8 +282,6 @@ function ProfileModal({ user, onClose }) {
           )}
         </div>
       )}
-
-      {/* Aba de configurações removida */}
     </div>
   );
 }

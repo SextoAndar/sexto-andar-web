@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import './Modal.css';
 
-function Modal({ isOpen, onClose, children, title }) {
+function Modal({ isOpen, onClose, children, title, headerChildren }) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -21,6 +21,7 @@ function Modal({ isOpen, onClose, children, title }) {
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           {title && <h2 className="modal-title">{title}</h2>}
+          {headerChildren}
           <button className="modal-close" onClick={onClose}>
             ×
           </button>

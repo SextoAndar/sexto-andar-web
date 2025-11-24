@@ -36,8 +36,8 @@
 
 .modal-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   padding: 1.5rem;
   border-bottom: 1px solid #eee;
 }
@@ -46,6 +46,7 @@
   margin: 0;
   font-size: 1.5rem;
   color: #333;
+  flex-grow: 1; /* Allows title to take available space */
 }
 
 .modal-close {

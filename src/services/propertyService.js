@@ -9,8 +9,11 @@ export async function fetchProperties({ page = 1, size = 12, ...params } = {}) {
   return await res.json();
 }
 
-export async function fetchOwnerProperties() {
-  const res = await fetch('/api/api/properties/owner/my-properties', {
+export async function fetchOwnerProperties({ active_only = true } = {}) {
+  const url = new URL('/api/api/properties/owner/my-properties', window.location.origin);
+  url.searchParams.set('active_only', active_only);
+  
+  const res = await fetch(url.toString(), {
     method: 'GET',
     credentials: 'include',
   });
@@ -149,6 +152,41 @@ export async function fetchFavoriteProperties({ page = 1, size = 10, active_only
     credentials: 'include',
   });
   if (!res.ok) throw new Error('Erro ao buscar propriedades favoritas');
+  return await res.json();
+}
+
+export async function deleteProperty(propertyId) {
+  const res = await fetch(`/api/api/properties/${propertyId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Erro ao excluir propriedade');
+}
+
+export async function getPortfolioStats() {
+  const res = await fetch('/api/api/properties/owner/portfolio-stats', {
+    method: 'GET',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Erro ao buscar estatísticas do portfólio');
+  return await res.json();
+}
+
+export async function activateProperty(propertyId) {
+  const res = await fetch(`/api/api/properties/${propertyId}/activate`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Erro ao reativar propriedade');
+  return await res.json();
+}
+
+export async function getFavoritesCount() {
+  const res = await fetch('/api/api/favorites/count/total', {
+    method: 'GET',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Erro ao buscar a contagem de favoritos');
   return await res.json();
 }
 

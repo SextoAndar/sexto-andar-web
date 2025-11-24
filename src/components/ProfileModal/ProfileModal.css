@@ -190,3 +190,15 @@
   padding: 3rem;
   font-size: 1rem;
 }
+
+.owner-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .owner-stats {
+    grid-template-columns: 1fr;
+  }
+}

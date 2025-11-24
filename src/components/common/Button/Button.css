@@ -31,3 +31,12 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.btn-danger {
+  background-color: #f44336;
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #d32f2f;
+}

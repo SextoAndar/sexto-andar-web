@@ -1,19 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from '../common/Modal/Modal';
+import Button from '../common/Button/Button';
 import PropertyCard from '../PropertyCard/PropertyCard';
 import PropertyEditModal from '../PropertyEditModal/PropertyEditModal';
-import { fetchOwnerProperties } from '../../services/propertyService';
+import TrashModal from '../TrashModal/TrashModal';
+import { fetchOwnerProperties, deleteProperty } from '../../services/propertyService';
 import './OwnerPropertiesModal.css';
 
 function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties }) {
   const [properties, setProperties] = useState(initialProperties);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isTrashModalOpen, setIsTrashModalOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
+
+  const loadActiveProperties = async () => {
+    try {
+      const data = await fetchOwnerProperties({ active_only: true });
+      setProperties(data.properties);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      loadActiveProperties();
+    }
+  }, [isOpen]);
 
   const handleEditProperty = (propertyId) => {
     const propertyToEdit = properties.find(p => p.id === propertyId);
     setSelectedProperty(propertyToEdit);
     setIsEditModalOpen(true);
+  };
+
+  const handleDeleteProperty = async (propertyId) => {
+    if (window.confirm('Tem certeza que deseja desativar este imóvel?')) {
+      try {
+        await deleteProperty(propertyId);
+        loadActiveProperties();
+      } catch (error) {
+        console.error(error.message);
+        alert(`Erro ao desativar imóvel: ${error.message}`);
+      }
+    }
   };
 
   const handleCloseEditModal = () => {
@@ -22,17 +52,20 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties }
   };
 
   const handleCloseAndRefresh = async () => {
-    const updatedProperties = await fetchOwnerProperties();
-    setProperties(updatedProperties);
+    loadActiveProperties();
     handleCloseEditModal();
   };
+  
+  const handleTrashModalClose = () => {
+    setIsTrashModalOpen(false);
+    loadActiveProperties();
+  }
 
   const handleImageUpdate = async () => {
     console.log('handleImageUpdate: Refreshing properties...');
     const updatedPropertiesData = await fetchOwnerProperties();
     console.log('handleImageUpdate: Received properties data:', updatedPropertiesData);
     
-    // The actual array is in the 'properties' key
     const updatedProperties = updatedPropertiesData.properties;
     
     setProperties(updatedProperties);
@@ -46,14 +79,18 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties }
     }
   };
 
-  // Update properties if initialProperties change
-  React.useEffect(() => {
-    setProperties(initialProperties);
-  }, [initialProperties]);
-
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} title="Minhas Propriedades">
+      <Modal 
+        isOpen={isOpen} 
+        onClose={onClose} 
+        title="Minhas Propriedades"
+        headerChildren={
+          <button className="trash-button" onClick={() => setIsTrashModalOpen(true)} title="Lixeira">
+            🗑️
+          </button>
+        }
+      >
         <div className="owner-properties-list">
           {properties && properties.length > 0 ? (
             properties.map(property => (
@@ -61,11 +98,12 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties }
                 key={property.id} 
                 property={property} 
                 variant="edit"
-                onEdit={handleEditProperty}
+                onEdit={() => handleEditProperty(property.id)}
+                onDelete={() => handleDeleteProperty(property.id)}
               />
             ))
           ) : (
-            <p>Você ainda não cadastrou nenhuma propriedade.</p>
+            <p>Você ainda não cadastrou nenhuma propriedade ativa.</p>
           )}
         </div>
       </Modal>
@@ -79,6 +117,11 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties }
           onImageUpdate={handleImageUpdate}
         />
       )}
+
+      <TrashModal 
+        isOpen={isTrashModalOpen}
+        onClose={handleTrashModalClose}
+      />
     </>
   );
 }

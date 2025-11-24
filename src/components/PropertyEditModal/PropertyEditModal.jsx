@@ -119,6 +119,24 @@ const PropertyEditModal = ({ isOpen, onClose, property, onSave, onImageUpdate })
   };
 
 
+  const handleDeleteProperty = async () => {
+    if (window.confirm('Tem certeza que deseja excluir este imóvel? Esta ação não pode ser desfeita.')) {
+      setLoading(true);
+      setError(null);
+      try {
+        await propertyService.deleteProperty(property.id);
+        console.log('handleDeleteProperty: Property deleted successfully.');
+        onSave(); // Close modal and refresh list
+      } catch (err) {
+        console.error('handleDeleteProperty: Error deleting property:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('handleSubmit: Starting property update...');
@@ -196,7 +214,7 @@ const PropertyEditModal = ({ isOpen, onClose, property, onSave, onImageUpdate })
           <div className="current-images">
             {images.map(img => (
               <div key={img.id} className={`img-container ${img.is_primary ? 'primary' : ''}`}>
-                <img src={`http://localhost:8000/api/images/${img.id}`} alt="Property" />
+                <img src={`/api/api/images/${img.id}`} alt="Property" />
                 <div className="img-actions">
                   <button type="button" onClick={() => handleDeleteImage(img.id)} title="Apagar">🗑️</button>
                   {!img.is_primary && <button type="button" onClick={() => handleSetPrimary(img.id)} title="Definir como principal">⭐</button>}
@@ -234,6 +252,9 @@ const PropertyEditModal = ({ isOpen, onClose, property, onSave, onImageUpdate })
           <Button type="button" onClick={onClose} variant="secondary">Cancelar</Button>
           <Button type="submit" variant="primary" disabled={loading}>
             {loading ? 'Salvando...' : 'Salvar Alterações'}
+          </Button>
+          <Button type="button" onClick={handleDeleteProperty} variant="danger" disabled={loading}>
+            Excluir Imóvel
           </Button>
         </div>
       </form>

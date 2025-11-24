@@ -3,7 +3,7 @@
 import './PropertyCard.css';
 
 
-function PropertyCard({ property, onDetails, onEdit, onUnfavorite, variant }) {
+function PropertyCard({ property, onDetails, onEdit, onUnfavorite, onDelete, onReactivate, variant }) {
   const primaryImage = property.images?.find(img => img.is_primary) || property.images?.[0];
   const imgUrl = primaryImage
     ? `/api/api/images/${primaryImage.id}`
@@ -21,10 +21,18 @@ function PropertyCard({ property, onDetails, onEdit, onUnfavorite, variant }) {
     if (onUnfavorite) onUnfavorite(property.id);
   };
 
+  const handleDelete = () => {
+    if (onDelete) onDelete(property.id);
+  };
+
+  const handleReactivate = () => {
+    if (onReactivate) onReactivate(property.id);
+  };
+
   return (
     <div className="property-card">
       <div className="property-card-header">
-        <span className="tag">Disponível</span>
+        <span className={`tag ${property.is_active ? '' : 'inactive'}`}>{property.is_active ? 'Disponível' : 'Inativo'}</span>
         <span className="tag">{property.propertyType === 'APARTMENT' ? 'Apartamento' : 'Casa'}</span>
         {property.petFriendly && <span className="tag">Pet friendly</span>}
       </div>
@@ -47,12 +55,17 @@ function PropertyCard({ property, onDetails, onEdit, onUnfavorite, variant }) {
           <span>📐 {property.propertySize}m²</span>
         </div>
         {variant === 'edit' ? (
-          <button className="property-edit-btn" onClick={handleEdit}>Editar Imóvel</button>
+          <div className="property-card-actions">
+            <button className="property-edit-btn" onClick={handleEdit}>Editar Imóvel</button>
+            <button className="property-delete-btn" onClick={handleDelete}>Excluir</button>
+          </div>
         ) : variant === 'unfavorite' ? (
           <div className="property-card-actions">
             <button className="property-unfavorite-btn" onClick={handleUnfavorite}>Desfavoritar</button>
             <button className="property-details-btn" onClick={handleDetails}>Ver Detalhes</button>
           </div>
+        ) : variant === 'reactivate' ? (
+          <button className="property-reactivate-btn" onClick={handleReactivate}>Reativar</button>
         ) : (
           <button className="property-details-btn" onClick={handleDetails}>Ver Detalhes</button>
         )}

@@ -3,7 +3,7 @@
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   overflow: hidden;
-  width: 320px;
+  width: 420px; /* Increased width */
   margin: 0 12px 32px 0;
   display: flex;
   flex-direction: column;
@@ -80,8 +80,8 @@
   color: #fff;
   border: none;
   border-radius: 8px;
-  /* padding: 0.7rem 1.2rem; */ /* Removed */
-  /* font-size: 1rem; */ /* Removed */
+  padding: 0.7rem 1.2rem; /* Restored */
+  font-size: 1rem;     /* Restored */
   font-weight: 600;
   cursor: pointer;
   margin-top: 0.5rem;
@@ -95,8 +95,8 @@
   color: #fff;
   border: none;
   border-radius: 8px;
-  /* padding: 0.7rem 1.2rem; */ /* Removed */
-  /* font-size: 1rem; */ /* Removed */
+  padding: 0.7rem 1.2rem; /* Restored */
+  font-size: 1rem;     /* Restored */
   font-weight: 600;
   cursor: pointer;
   margin-top: 0.5rem;
@@ -111,8 +111,8 @@
   color: #fff;
   border: none;
   border-radius: 8px;
-  /* padding: 0.7rem 1.2rem; */ /* Removed */
-  /* font-size: 1rem; */ /* Removed */
+  padding: 0.7rem 1.2rem; /* Restored */
+  font-size: 1rem;     /* Restored */
   font-weight: 600;
   cursor: pointer;
   margin-top: 0.5rem;
@@ -128,8 +128,8 @@
   color: #fff;
   border: none;
   border-radius: 8px;
-  /* padding: 0.7rem 1.2rem; */ /* Removed */
-  /* font-size: 1rem; */ /* Removed */
+  padding: 0.7rem 1.2rem; /* Restored */
+  font-size: 1rem;     /* Restored */
   font-weight: 600;
   cursor: pointer;
   margin-top: 0.5rem;
@@ -159,13 +159,12 @@
   color: #fff;
   border: none;
   border-radius: 8px;
-  /* padding: 0.7rem 1.2rem; */ /* Removed */
-  /* font-size: 1rem; */ /* Removed */
+  padding: 0.7rem 1.2rem; /* Restored */
+  font-size: 1rem;     /* Restored */
   font-weight: 600;
   cursor: pointer;
   margin-top: 0.5rem;
   transition: background 0.2s;
-  /* width: 100%; */ /* Removed */
 }
 
 .property-reactivate-btn:hover {
@@ -177,53 +176,36 @@
   color: #666;
 }
 
-/* Removed */
-/* .property-card-actions > button {
-  width: 33%;
-} */
-
-/* Removed */
-/* .property-view-proposals-btn {
+.property-view-proposals-btn {
   background: #007bff;
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 0.7rem 1.2rem;
-  font-size: 1rem;
+  padding: 0.7rem 1.2rem; /* Restored */
+  font-size: 1rem;     /* Restored */
   font-weight: 600;
   cursor: pointer;
   margin-top: 0.5rem;
   transition: background 0.2s;
-} */
+}
 
-/* Removed */
-/* .property-view-proposals-btn:hover {
+.property-view-proposals-btn:hover {
   background: #0056b3;
-} */
+}
 
-/* Removed */
-/* .property-card-actions > button {
-  width: 25%;
-} */
-
-/* Removed */
-/* .property-view-visits-btn {
-  background: #00a868;
+.property-view-visits-btn {
+  background: #00a868; /* Primary button color */
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 0.7rem 1.2rem;
-  font-size: 1rem;
+  padding: 0.7rem 1.2rem; /* Restored */
+  font-size: 1rem;     /* Restored */
   font-weight: 600;
   cursor: pointer;
   margin-top: 0.5rem;
   transition: background 0.2s;
-} */
+}
 
-/* Removed */
-/* .property-view-visits-btn:hover {
-  background: #008c56;
-} */
-
-
-
+.property-view-visits-btn:hover {
+  background: #008c56; /* Darker primary color on hover */
+}

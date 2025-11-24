@@ -16,7 +16,7 @@
   background: white;
   border-radius: 8px;
   width: 100%;
-  max-width: 920px;
+  max-width: 1200px; /* Increased max-width */
   max-height: 90vh;
   overflow-y: auto;
   position: relative;

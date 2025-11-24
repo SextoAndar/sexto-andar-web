@@ -1,3 +1,5 @@
+// src/components/MyProposalsModal/MyProposalsModal.jsx
+
 import React, { useState, useEffect } from 'react';
 import Modal from '../common/Modal/Modal';
 import ProposalCard from '../ProposalCard/ProposalCard';
@@ -30,18 +32,22 @@ function MyProposalsModal({ isOpen, onClose, user }) {
   }, [isOpen]);
 
   const handleWithdraw = async (proposalId) => {
-    try {
-      await withdrawProposal(proposalId);
-      loadProposals(); // Refresh the list
-    } catch (error) {
-      alert(`Erro ao retirar proposta: ${error.message}`);
+    if (window.confirm('Tem certeza que deseja retirar esta proposta?')) {
+      try {
+        await withdrawProposal(proposalId);
+        alert('Proposta retirada com sucesso!');
+        loadProposals(); // Refresh the list
+      } catch (error) {
+        alert(`Erro ao retirar proposta: ${error.message}`);
+      }
     }
   };
 
   const handleDelete = async (proposalId) => {
-    if (window.confirm('Tem certeza que deseja excluir esta proposta?')) {
+    if (window.confirm('Tem certeza que deseja excluir esta proposta? Esta ação não pode ser desfeita.')) {
       try {
         await deleteProposal(proposalId);
+        alert('Proposta excluída com sucesso!');
         loadProposals(); // Refresh the list
       } catch (error) {
         alert(`Erro ao excluir proposta: ${error.message}`);
@@ -54,7 +60,7 @@ function MyProposalsModal({ isOpen, onClose, user }) {
     setIsProposalDetailsOpen(true);
   };
 
-  const handleCloseProposalDetails = () => {
+  const handleCloseProposalDetails = () => { 
     setIsProposalDetailsOpen(false);
     setSelectedProposalId(null);
   };
@@ -70,8 +76,8 @@ function MyProposalsModal({ isOpen, onClose, user }) {
               <ProposalCard
                 key={proposal.id}
                 proposal={proposal}
-                onWithdraw={() => handleWithdraw(proposal.id)}
-                onDelete={() => handleDelete(proposal.id)}
+                onWithdraw={handleWithdraw}
+                onDelete={handleDelete}
                 onViewDetails={() => handleOpenProposalDetails(proposal.id)}
                 isOwnerView={false}
               />

@@ -71,7 +71,14 @@
 .visit-card-actions {
   display: flex;
   justify-content: flex-end;
+  gap: 0.5rem; /* Add gap between buttons */
+  flex-wrap: wrap; /* Allow buttons to wrap */
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid #f0f0f0;
 }
+
+.visit-card-actions > button {
+  width: 33%; /* Adjust for three buttons */
+}
+

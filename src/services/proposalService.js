@@ -1,7 +1,7 @@
 export async function getReceivedProposals({ page = 1, size = 10 } = {}) {
   const url = new URL('/api/api/proposals/received', window.location.origin);
   url.searchParams.set('page', page);
-  url.searchParams.set('size', size);
+  url.searchParams.set('size', String(size)); // Convert to string
   
   const res = await fetch(url.toString(), {
     method: 'GET',
@@ -53,7 +53,7 @@ export async function submitProposal(proposalData) {
 export async function getMyProposals({ page = 1, size = 10 } = {}) {
   const url = new URL('/api/api/proposals/my-proposals', window.location.origin);
   url.searchParams.set('page', page);
-  url.searchParams.set('size', size);
+  url.searchParams.set('size', String(size)); // Convert to string
   
   const res = await fetch(url.toString(), {
     method: 'GET',
@@ -84,7 +84,7 @@ export async function getProposalById(proposalId) {
 export async function getProposalsForProperty(propertyId, { page = 1, size = 10 } = {}) {
   const url = new URL(`/api/api/proposals/property/${propertyId}`, window.location.origin);
   url.searchParams.set('page', page);
-  url.searchParams.set('size', size);
+  url.searchParams.set('size', String(size)); // Convert to string
 
   const res = await fetch(url.toString(), {
     method: 'GET',

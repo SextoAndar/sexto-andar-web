@@ -76,3 +76,53 @@ export async function cancelVisit(visitId) {
   }
   return await res.json();
 }
+
+export async function getUpcomingVisits() {
+  const res = await fetch('/api/api/visits/upcoming', {
+    method: 'GET',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Erro ao buscar próximas visitas');
+  return await res.json();
+}
+
+export async function updateVisit(visitId, visitData) {
+  const res = await fetch(`/api/api/visits/${visitId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(visitData),
+  });
+  if (!res.ok) throw new Error('Erro ao atualizar visita');
+  return await res.json();
+}
+
+export async function completeVisit(visitId, notes = '') {
+  const res = await fetch(`/api/api/visits/${visitId}/complete`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ notes }),
+  });
+  if (!res.ok) throw new Error('Erro ao concluir visita');
+  return await res.json();
+}
+
+export async function getPublicPropertyVisits(propertyId, { page = 1, size = 10, include_cancelled = false } = {}) {
+  const url = new URL(`/api/api/visits/property/${propertyId}/visits`, window.location.origin);
+  url.searchParams.set('page', page);
+  url.searchParams.set('size', size);
+  url.searchParams.set('include_cancelled', include_cancelled);
+
+  const res = await fetch(url.toString(), {
+    method: 'GET',
+    credentials: 'include', // Frontend will ignore if not authenticated, backend handles public/private
+  });
+  if (!res.ok) throw new Error('Erro ao buscar horários de visita públicos');
+  return await res.json();
+}
+

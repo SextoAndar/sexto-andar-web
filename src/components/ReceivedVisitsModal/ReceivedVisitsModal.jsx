@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../common/Modal/Modal';
 import VisitCard from '../VisitCard/VisitCard';
-import { getAllOwnerVisits, getVisitsForSpecificProperty, cancelVisit } from '../../services/visitService';
+import { getAllOwnerVisits, getVisitsForSpecificProperty, cancelVisit, completeVisit } from '../../services/visitService';
 import './ReceivedVisitsModal.css';
 
 function ReceivedVisitsModal({ isOpen, onClose, propertyId }) {
@@ -40,6 +40,18 @@ function ReceivedVisitsModal({ isOpen, onClose, propertyId }) {
     }
   };
 
+  const handleComplete = async (visitId) => {
+    if (window.confirm('Tem certeza que deseja marcar esta visita como concluída?')) {
+      try {
+        await completeVisit(visitId);
+        alert('Visita marcada como concluída com sucesso!');
+        loadVisits(); // Refresh the list
+      } catch (error) {
+        alert(`Erro ao marcar visita como concluída: ${error.message}`);
+      }
+    }
+  };
+
   const modalTitle = propertyId ? "Visitas para este Imóvel" : "Visitas Recebidas";
 
   return (
@@ -53,6 +65,7 @@ function ReceivedVisitsModal({ isOpen, onClose, propertyId }) {
               key={visit.id}
               visit={visit}
               onCancel={handleCancel}
+              onComplete={handleComplete}
               isOwnerView={true}
             />
           ))

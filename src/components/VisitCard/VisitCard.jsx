@@ -11,7 +11,7 @@ const formatDate = (dateString) => {
   });
 };
 
-function VisitCard({ visit, onCancel, isOwnerView }) {
+function VisitCard({ visit, onCancel, onEdit, onComplete, isOwnerView }) {
   const [property, setProperty] = useState(null);
   const { idProperty, visitDate, status, notes, user } = visit;
 
@@ -59,6 +59,12 @@ function VisitCard({ visit, onCancel, isOwnerView }) {
       </div>
       {(status === 'scheduled') && (
         <div className="visit-card-actions">
+          {onEdit && (
+            <Button onClick={() => onEdit(visit)} variant="secondary">Editar</Button>
+          )}
+          {onComplete && (
+            <Button onClick={() => onComplete(visit.id)} variant="primary">Concluir</Button>
+          )}
           {onCancel && (
             <Button onClick={() => onCancel(visit.id)} variant="danger">Cancelar Visita</Button>
           )}

@@ -1,0 +1,30 @@
+.edit-visit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.edit-visit-form .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-visit-form label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.edit-visit-form textarea {
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.edit-visit-form .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}

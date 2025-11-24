@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchPropertyById, favoriteProperty, unfavoriteProperty, getFavoriteStatus } from '../../services/propertyService';
-import { scheduleVisit } from '../../services/visitService';
+import { scheduleVisit, getPublicPropertyVisits } from '../../services/visitService';
 import Button from '../common/Button/Button';
 import ProposalFormModal from '../ProposalFormModal/ProposalFormModal';
 import ScheduleVisitModal from '../ScheduleVisitModal/ScheduleVisitModal';
@@ -13,6 +13,7 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
   const [isScheduleVisitModalOpen, setIsScheduleVisitModalOpen] = useState(false);
+  const [publicVisitDates, setPublicVisitDates] = useState([]);
 
   useEffect(() => {
     if (!isOpen || !propertyId) return;
@@ -29,6 +30,9 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
           const favoriteStatus = await getFavoriteStatus(propertyId);
           setIsFavorited(favoriteStatus.is_favorited);
         }
+        
+        const publicVisits = await getPublicPropertyVisits(propertyId);
+        setPublicVisitDates(publicVisits.visits);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -62,9 +66,19 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
       await scheduleVisit({ ...visitData, idProperty: propertyId });
       alert('Visita agendada com sucesso!');
       setIsScheduleVisitModalOpen(false);
+      // Refresh public visit dates after scheduling
+      const publicVisits = await getPublicPropertyVisits(propertyId);
+      setPublicVisitDates(publicVisits.visits);
     } catch (err) {
       alert(`Erro ao agendar visita: ${err.message}`);
     }
+  };
+
+  const formatVisitDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('pt-BR', {
+      year: 'numeric', month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
   };
 
   if (!isOpen) return null;
@@ -109,6 +123,22 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
                 <p><strong>Tipo:</strong> {property.propertyType}</p>
                 <p><strong>Venda/Aluguel:</strong> {property.salesType}</p>
               </div>
+              
+              <div className="public-visits-section">
+                <h4>Visitas Agendadas</h4>
+                {publicVisitDates.length > 0 ? (
+                  <ul>
+                    {publicVisitDates.map(visit => (
+                      <li key={visit.id}>
+                        {formatVisitDate(visit.visitDate)} - Status: {visit.status}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>Nenhuma visita pública agendada.</p>
+                )}
+              </div>
+
               {user && user.role === 'USER' && (
                 <div className="property-details-actions">
                   <Button onClick={() => setIsProposalModalOpen(true)} variant="primary">

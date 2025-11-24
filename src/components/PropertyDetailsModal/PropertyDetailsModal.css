@@ -52,3 +52,9 @@
   font-size: 1.5rem;
   cursor: pointer;
 }
+
+.property-details-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}

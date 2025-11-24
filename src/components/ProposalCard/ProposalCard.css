@@ -1,0 +1,83 @@
+.proposal-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-left: 5px solid #ccc;
+}
+
+.proposal-card.status-pending {
+  border-left-color: #f7b500;
+}
+.proposal-card.status-accepted {
+  border-left-color: #00a868;
+}
+.proposal-card.status-rejected,
+.proposal-card.status-withdrawn {
+  border-left-color: #f44336;
+}
+
+.proposal-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.proposal-property-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.proposal-property-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.proposal-property-title {
+  font-weight: 500;
+  color: #333;
+}
+
+.proposal-status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.proposal-status-badge.status-pending { background-color: #f7b500; }
+.proposal-status-badge.status-accepted { background-color: #00a868; }
+.proposal-status-badge.status-rejected,
+.proposal-status-badge.status-withdrawn { background-color: #f44336; }
+
+.proposal-card-body {
+  display: grid;
+  gap: 1rem;
+}
+
+.proposal-value {
+  font-weight: 600;
+  color: #00a868;
+}
+
+.proposal-message p {
+  margin: 0.25rem 0;
+}
+
+.proposal-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+}

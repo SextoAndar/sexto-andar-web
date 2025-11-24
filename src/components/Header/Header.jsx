@@ -6,11 +6,15 @@ import './Header.css';
 import PropertyRegisterModal from '../PropertyRegisterModal/PropertyRegisterModal';
 import OwnerPropertiesModal from '../OwnerPropertiesModal/OwnerPropertiesModal';
 import FavoritesModal from '../FavoritesModal/FavoritesModal';
+import ProposalsModal from '../ProposalsModal/ProposalsModal';
+import MyProposalsModal from '../MyProposalsModal/MyProposalsModal';
 
 function Header({ onLoginClick, onProfileClick, user, onLogout }) {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isOwnerPropertiesModalOpen, setIsOwnerPropertiesModalOpen] = useState(false);
   const [isFavoritesModalOpen, setIsFavoritesModalOpen] = useState(false);
+  const [isProposalsModalOpen, setIsProposalsModalOpen] = useState(false);
+  const [isMyProposalsModalOpen, setIsMyProposalsModalOpen] = useState(false);
   const [ownerProperties, setOwnerProperties] = useState([]);
 
   const handleLogout = async () => {
@@ -51,6 +55,14 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
   const handleFavoritesClick = () => {
     setIsFavoritesModalOpen(true);
   };
+  
+  const handleProposalsClick = () => {
+    setIsProposalsModalOpen(true);
+  };
+
+  const handleMyProposalsClick = () => {
+    setIsMyProposalsModalOpen(true);
+  };
 
   return (
     <>
@@ -77,20 +89,32 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
               </a>
             )}
             {user && user.role === 'PROPERTY_OWNER' && (
-              <a href="#" className="nav-link" onClick={handleMyPropertiesClick}>
-                <span className="nav-icon">🏠</span>
-                Minhas Propriedades
-              </a>
+              <>
+                <a href="#" className="nav-link" onClick={handleMyPropertiesClick}>
+                  <span className="nav-icon">🏠</span>
+                  Minhas Propriedades
+                </a>
+                <a href="#" className="nav-link" onClick={handleProposalsClick}>
+                  <span className="nav-icon">✉️</span>
+                  Propostas Recebidas
+                </a>
+              </>
             )}
             <a href="#" className="nav-link">
               <span className="nav-icon">🔍</span>
               Buscar
             </a>
             {user && user.role === 'USER' && (
-              <a href="#" className="nav-link" onClick={handleFavoritesClick}>
-                <span className="nav-icon">❤️</span>
-                Favoritos
-              </a>
+              <>
+                <a href="#" className="nav-link" onClick={handleFavoritesClick}>
+                  <span className="nav-icon">❤️</span>
+                  Favoritos
+                </a>
+                <a href="#" className="nav-link" onClick={handleMyProposalsClick}>
+                  <span className="nav-icon">✉️</span>
+                  Minhas Propostas
+                </a>
+              </>
             )}
           </nav>
 
@@ -123,6 +147,16 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
       <FavoritesModal
         isOpen={isFavoritesModalOpen}
         onClose={() => setIsFavoritesModalOpen(false)}
+        user={user}
+      />
+      <ProposalsModal
+        isOpen={isProposalsModalOpen}
+        onClose={() => setIsProposalsModalOpen(false)}
+        user={user}
+      />
+      <MyProposalsModal
+        isOpen={isMyProposalsModalOpen}
+        onClose={() => setIsMyProposalsModalOpen(false)}
         user={user}
       />
     </>

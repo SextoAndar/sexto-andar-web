@@ -1,0 +1,30 @@
+.proposal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.proposal-form .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.proposal-form label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.proposal-form textarea {
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.proposal-form .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}

@@ -15,7 +15,7 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('pt-BR');
 };
 
-function ProposalCard({ proposal, onAccept, onReject, onWithdraw, onViewDetails, isOwnerView }) {
+function ProposalCard({ proposal, onAccept, onReject, onWithdraw, onViewDetails, isOwnerView, onDelete }) {
   const [property, setProperty] = useState(null);
   const { proposalValue, message, status, proposalDate, response_message } = proposal;
 
@@ -77,6 +77,9 @@ function ProposalCard({ proposal, onAccept, onReject, onWithdraw, onViewDetails,
         )}
         {status === 'pending' && onWithdraw && (
           <Button onClick={() => onWithdraw(proposal.id)} variant="danger">Retirar Proposta</Button>
+        )}
+        {status !== 'pending' && onDelete && (
+          <Button onClick={() => onDelete(proposal.id)} variant="danger">Excluir</Button>
         )}
       </div>
     </div>

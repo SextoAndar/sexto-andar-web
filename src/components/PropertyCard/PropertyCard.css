@@ -172,3 +172,25 @@
   color: #666;
 }
 
+.property-card-actions > button {
+  width: 33%; /* Adjust for 3 buttons */
+}
+
+.property-view-proposals-btn {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+
+.property-view-proposals-btn:hover {
+  background: #0056b3;
+}
+
+

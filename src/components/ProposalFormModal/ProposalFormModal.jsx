@@ -17,7 +17,7 @@ function ProposalFormModal({ isOpen, onClose, propertyId, onProposalSubmitted })
       await submitProposal({
         idProperty: propertyId,
         proposalValue: parseFloat(proposalValue),
-        message,
+        message: message || '', // Ensure message is always a string
       });
       alert('Proposta enviada com sucesso!');
       onProposalSubmitted();

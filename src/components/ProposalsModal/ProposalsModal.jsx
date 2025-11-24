@@ -1,38 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../common/Modal/Modal';
 import ProposalCard from '../ProposalCard/ProposalCard';
-import { getReceivedProposals, acceptProposal, rejectProposal } from '../../services/proposalService';
-import PropertyDetailsModal from '../PropertyDetailsModal/PropertyDetailsModal';
+import { getReceivedProposals, getProposalsForProperty, acceptProposal, rejectProposal } from '../../services/proposalService';
+import ProposalDetailsModal from '../ProposalDetailsModal/ProposalDetailsModal';
 import './ProposalsModal.css';
 
-function ProposalsModal({ isOpen, onClose, user }) {
+function ProposalsModal({ isOpen, onClose, user, propertyId }) {
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedPropertyId, setSelectedPropertyId] = useState(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-
-  const loadProposals = async () => {
-    setLoading(true);
-    try {
-      const data = await getReceivedProposals();
-      setProposals(data.proposals);
-    } catch (error) {
-      console.error(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [selectedProposalId, setSelectedProposalId] = useState(null);
+  const [isProposalDetailsOpen, setIsProposalDetailsOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      loadProposals();
+      setLoading(true);
+      const fetchProposals = propertyId 
+        ? getProposalsForProperty(propertyId)
+        : getReceivedProposals();
+
+      fetchProposals
+        .then(data => setProposals(data.proposals))
+        .catch(err => console.error(err.message))
+        .finally(() => setLoading(false));
     }
-  }, [isOpen]);
+  }, [isOpen, propertyId]);
 
   const handleAccept = async (proposalId) => {
     try {
       await acceptProposal(proposalId);
-      loadProposals(); // Refresh the list
+      const data = propertyId 
+        ? await getProposalsForProperty(propertyId)
+        : await getReceivedProposals();
+      setProposals(data.proposals);
     } catch (error) {
       alert(`Erro ao aceitar proposta: ${error.message}`);
     }
@@ -41,25 +40,30 @@ function ProposalsModal({ isOpen, onClose, user }) {
   const handleReject = async (proposalId) => {
     try {
       await rejectProposal(proposalId);
-      loadProposals(); // Refresh the list
+      const data = propertyId 
+        ? await getProposalsForProperty(propertyId)
+        : await getReceivedProposals();
+      setProposals(data.proposals);
     } catch (error) {
       alert(`Erro ao rejeitar proposta: ${error.message}`);
     }
   };
   
-  const handleOpenDetails = (propertyId) => {
-    setSelectedPropertyId(propertyId);
-    setIsDetailsOpen(true);
+  const handleOpenProposalDetails = (proposalId) => {
+    setSelectedProposalId(proposalId);
+    setIsProposalDetailsOpen(true);
   };
 
-  const handleCloseDetails = () => {
-    setIsDetailsOpen(false);
-    setSelectedPropertyId(null);
+  const handleCloseProposalDetails = () => {
+    setIsProposalDetailsOpen(false);
+    setSelectedProposalId(null);
   };
+
+  const modalTitle = propertyId ? "Propostas para este Imóvel" : "Propostas Recebidas";
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} title="Propostas Recebidas">
+      <Modal isOpen={isOpen} onClose={onClose} title={modalTitle}>
         <div className="proposals-list">
           {loading ? (
             <p>Carregando propostas...</p>
@@ -68,22 +72,21 @@ function ProposalsModal({ isOpen, onClose, user }) {
               <ProposalCard
                 key={proposal.id}
                 proposal={proposal}
-                onAccept={handleAccept}
-                onReject={handleReject}
-                onViewDetails={handleOpenDetails}
+                onAccept={() => handleAccept(proposal.id)}
+                onReject={() => handleReject(proposal.id)}
+                onViewDetails={() => handleOpenProposalDetails(proposal.id)}
                 isOwnerView={true}
               />
             ))
           ) : (
-            <p>Você não tem nenhuma proposta recebida.</p>
+            <p>Nenhuma proposta encontrada.</p>
           )}
         </div>
       </Modal>
-      <PropertyDetailsModal
-        propertyId={selectedPropertyId}
-        isOpen={isDetailsOpen}
-        onClose={handleCloseDetails}
-        user={user}
+      <ProposalDetailsModal
+        proposalId={selectedProposalId}
+        isOpen={isProposalDetailsOpen}
+        onClose={handleCloseProposalDetails}
       />
     </>
   );

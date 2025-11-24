@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../common/Modal/Modal';
 import ProposalCard from '../ProposalCard/ProposalCard';
-import { getMyProposals, withdrawProposal } from '../../services/proposalService';
-import PropertyDetailsModal from '../PropertyDetailsModal/PropertyDetailsModal';
+import { getMyProposals, withdrawProposal, deleteProposal } from '../../services/proposalService';
+import ProposalDetailsModal from '../ProposalDetailsModal/ProposalDetailsModal';
 import './MyProposalsModal.css';
 
 function MyProposalsModal({ isOpen, onClose, user }) {
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedPropertyId, setSelectedPropertyId] = useState(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedProposalId, setSelectedProposalId] = useState(null);
+  const [isProposalDetailsOpen, setIsProposalDetailsOpen] = useState(false);
 
   const loadProposals = async () => {
     setLoading(true);
@@ -38,14 +38,25 @@ function MyProposalsModal({ isOpen, onClose, user }) {
     }
   };
 
-  const handleOpenDetails = (propertyId) => {
-    setSelectedPropertyId(propertyId);
-    setIsDetailsOpen(true);
+  const handleDelete = async (proposalId) => {
+    if (window.confirm('Tem certeza que deseja excluir esta proposta?')) {
+      try {
+        await deleteProposal(proposalId);
+        loadProposals(); // Refresh the list
+      } catch (error) {
+        alert(`Erro ao excluir proposta: ${error.message}`);
+      }
+    }
   };
 
-  const handleCloseDetails = () => {
-    setIsDetailsOpen(false);
-    setSelectedPropertyId(null);
+  const handleOpenProposalDetails = (proposalId) => {
+    setSelectedProposalId(proposalId);
+    setIsProposalDetailsOpen(true);
+  };
+
+  const handleCloseProposalDetails = () => {
+    setIsProposalDetailsOpen(false);
+    setSelectedProposalId(null);
   };
 
   return (
@@ -59,8 +70,9 @@ function MyProposalsModal({ isOpen, onClose, user }) {
               <ProposalCard
                 key={proposal.id}
                 proposal={proposal}
-                onWithdraw={handleWithdraw}
-                onViewDetails={handleOpenDetails}
+                onWithdraw={() => handleWithdraw(proposal.id)}
+                onDelete={() => handleDelete(proposal.id)}
+                onViewDetails={() => handleOpenProposalDetails(proposal.id)}
                 isOwnerView={false}
               />
             ))
@@ -69,11 +81,10 @@ function MyProposalsModal({ isOpen, onClose, user }) {
           )}
         </div>
       </Modal>
-      <PropertyDetailsModal
-        propertyId={selectedPropertyId}
-        isOpen={isDetailsOpen}
-        onClose={handleCloseDetails}
-        user={user}
+      <ProposalDetailsModal
+        proposalId={selectedProposalId}
+        isOpen={isProposalDetailsOpen}
+        onClose={handleCloseProposalDetails}
       />
     </>
   );

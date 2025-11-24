@@ -142,7 +142,8 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
       <OwnerPropertiesModal 
         isOpen={isOwnerPropertiesModalOpen} 
         onClose={() => setIsOwnerPropertiesModalOpen(false)} 
-        properties={ownerProperties} 
+        properties={ownerProperties}
+        user={user}
       />
       <FavoritesModal
         isOpen={isFavoritesModalOpen}

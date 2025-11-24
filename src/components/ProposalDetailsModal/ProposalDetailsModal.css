@@ -1,0 +1,56 @@
+.proposal-details-content {
+  padding: 1rem;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.detail-value {
+  font-size: 1rem;
+}
+
+.detail-message {
+  background-color: #f8f9fa;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin: 0;
+}
+
+.detail-message.response {
+  background-color: #e8f5f1;
+}
+
+/* Reusing status badge styles */
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #fff;
+  text-transform: capitalize;
+  width: fit-content;
+}
+.status-badge.status-pending { background-color: #f7b500; }
+.status-badge.status-accepted { background-color: #00a868; }
+.status-badge.status-rejected,
+.status-badge.status-withdrawn { background-color: #f44336; }

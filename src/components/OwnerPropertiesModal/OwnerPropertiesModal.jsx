@@ -4,14 +4,17 @@ import Button from '../common/Button/Button';
 import PropertyCard from '../PropertyCard/PropertyCard';
 import PropertyEditModal from '../PropertyEditModal/PropertyEditModal';
 import TrashModal from '../TrashModal/TrashModal';
+import ProposalsModal from '../ProposalsModal/ProposalsModal';
 import { fetchOwnerProperties, deleteProperty } from '../../services/propertyService';
 import './OwnerPropertiesModal.css';
 
-function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties }) {
+function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, user }) {
   const [properties, setProperties] = useState(initialProperties);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isTrashModalOpen, setIsTrashModalOpen] = useState(false);
+  const [isProposalsModalOpen, setIsProposalsModalOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
+  const [selectedPropertyForProposals, setSelectedPropertyForProposals] = useState(null);
 
   const loadActiveProperties = async () => {
     try {
@@ -44,6 +47,11 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties }
         alert(`Erro ao desativar imóvel: ${error.message}`);
       }
     }
+  };
+
+  const handleViewProposals = (propertyId) => {
+    setSelectedPropertyForProposals(propertyId);
+    setIsProposalsModalOpen(true);
   };
 
   const handleCloseEditModal = () => {
@@ -100,6 +108,7 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties }
                 variant="edit"
                 onEdit={() => handleEditProperty(property.id)}
                 onDelete={() => handleDeleteProperty(property.id)}
+                onViewProposals={() => handleViewProposals(property.id)}
               />
             ))
           ) : (
@@ -121,6 +130,13 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties }
       <TrashModal 
         isOpen={isTrashModalOpen}
         onClose={handleTrashModalClose}
+      />
+
+      <ProposalsModal
+        isOpen={isProposalsModalOpen}
+        onClose={() => setIsProposalsModalOpen(false)}
+        propertyId={selectedPropertyForProposals}
+        user={user}
       />
     </>
   );

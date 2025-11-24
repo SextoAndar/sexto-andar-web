@@ -8,6 +8,8 @@ import OwnerPropertiesModal from '../OwnerPropertiesModal/OwnerPropertiesModal';
 import FavoritesModal from '../FavoritesModal/FavoritesModal';
 import ProposalsModal from '../ProposalsModal/ProposalsModal';
 import MyProposalsModal from '../MyProposalsModal/MyProposalsModal';
+import MyVisitsModal from '../MyVisitsModal/MyVisitsModal';
+import ReceivedVisitsModal from '../ReceivedVisitsModal/ReceivedVisitsModal';
 
 function Header({ onLoginClick, onProfileClick, user, onLogout }) {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
@@ -15,6 +17,8 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
   const [isFavoritesModalOpen, setIsFavoritesModalOpen] = useState(false);
   const [isProposalsModalOpen, setIsProposalsModalOpen] = useState(false);
   const [isMyProposalsModalOpen, setIsMyProposalsModalOpen] = useState(false);
+  const [isMyVisitsModalOpen, setIsMyVisitsModalOpen] = useState(false);
+  const [isReceivedVisitsModalOpen, setIsReceivedVisitsModalOpen] = useState(false);
   const [ownerProperties, setOwnerProperties] = useState([]);
 
   const handleLogout = async () => {
@@ -64,6 +68,14 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
     setIsMyProposalsModalOpen(true);
   };
 
+  const handleMyVisitsClick = () => {
+    setIsMyVisitsModalOpen(true);
+  };
+
+  const handleReceivedVisitsClick = () => {
+    setIsReceivedVisitsModalOpen(true);
+  };
+
   return (
     <>
       <header className="header">
@@ -98,6 +110,10 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
                   <span className="nav-icon">✉️</span>
                   Propostas Recebidas
                 </a>
+                <a href="#" className="nav-link" onClick={handleReceivedVisitsClick}>
+                  <span className="nav-icon">🗓️</span>
+                  Visitas Recebidas
+                </a>
               </>
             )}
             <a href="#" className="nav-link">
@@ -113,6 +129,10 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
                 <a href="#" className="nav-link" onClick={handleMyProposalsClick}>
                   <span className="nav-icon">✉️</span>
                   Minhas Propostas
+                </a>
+                <a href="#" className="nav-link" onClick={handleMyVisitsClick}>
+                  <span className="nav-icon">🗓️</span>
+                  Minhas Visitas
                 </a>
               </>
             )}
@@ -159,6 +179,14 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
         isOpen={isMyProposalsModalOpen}
         onClose={() => setIsMyProposalsModalOpen(false)}
         user={user}
+      />
+      <MyVisitsModal
+        isOpen={isMyVisitsModalOpen}
+        onClose={() => setIsMyVisitsModalOpen(false)}
+      />
+      <ReceivedVisitsModal
+        isOpen={isReceivedVisitsModalOpen}
+        onClose={() => setIsReceivedVisitsModalOpen(false)}
       />
     </>
   );

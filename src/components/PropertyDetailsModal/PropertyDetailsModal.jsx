@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { fetchPropertyById, favoriteProperty, unfavoriteProperty, getFavoriteStatus } from '../../services/propertyService';
+import { scheduleVisit } from '../../services/visitService';
 import Button from '../common/Button/Button';
 import ProposalFormModal from '../ProposalFormModal/ProposalFormModal';
+import ScheduleVisitModal from '../ScheduleVisitModal/ScheduleVisitModal';
 import './PropertyDetailsModal.css';
 
 const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
@@ -10,6 +12,7 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
   const [error, setError] = useState(null);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
+  const [isScheduleVisitModalOpen, setIsScheduleVisitModalOpen] = useState(false);
 
   useEffect(() => {
     if (!isOpen || !propertyId) return;
@@ -52,6 +55,16 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
 
   const handleProposalSubmitted = () => {
     // Could add a confirmation message here
+  };
+
+  const handleVisitScheduled = async (visitData) => {
+    try {
+      await scheduleVisit({ ...visitData, idProperty: propertyId });
+      alert('Visita agendada com sucesso!');
+      setIsScheduleVisitModalOpen(false);
+    } catch (err) {
+      alert(`Erro ao agendar visita: ${err.message}`);
+    }
   };
 
   if (!isOpen) return null;
@@ -101,6 +114,9 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
                   <Button onClick={() => setIsProposalModalOpen(true)} variant="primary">
                     Fazer Proposta
                   </Button>
+                  <Button onClick={() => setIsScheduleVisitModalOpen(true)} variant="secondary">
+                    Agendar Visita
+                  </Button>
                 </div>
               )}
             </>
@@ -113,6 +129,13 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
           onClose={() => setIsProposalModalOpen(false)}
           propertyId={propertyId}
           onProposalSubmitted={handleProposalSubmitted}
+        />
+      )}
+      {propertyId && (
+        <ScheduleVisitModal
+          isOpen={isScheduleVisitModalOpen}
+          onClose={() => setIsScheduleVisitModalOpen(false)}
+          onSchedule={handleVisitScheduled}
         />
       )}
     </>

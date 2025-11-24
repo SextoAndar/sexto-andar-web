@@ -5,6 +5,7 @@ import PropertyCard from '../PropertyCard/PropertyCard';
 import PropertyEditModal from '../PropertyEditModal/PropertyEditModal';
 import TrashModal from '../TrashModal/TrashModal';
 import ProposalsModal from '../ProposalsModal/ProposalsModal';
+import ReceivedVisitsModal from '../ReceivedVisitsModal/ReceivedVisitsModal';
 import { fetchOwnerProperties, deleteProperty } from '../../services/propertyService';
 import './OwnerPropertiesModal.css';
 
@@ -13,8 +14,10 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isTrashModalOpen, setIsTrashModalOpen] = useState(false);
   const [isProposalsModalOpen, setIsProposalsModalOpen] = useState(false);
+  const [isReceivedVisitsModalOpen, setIsReceivedVisitsModalOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [selectedPropertyForProposals, setSelectedPropertyForProposals] = useState(null);
+  const [selectedPropertyForVisits, setSelectedPropertyForVisits] = useState(null);
 
   const loadActiveProperties = async () => {
     try {
@@ -52,6 +55,11 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
   const handleViewProposals = (propertyId) => {
     setSelectedPropertyForProposals(propertyId);
     setIsProposalsModalOpen(true);
+  };
+
+  const handleViewVisits = (propertyId) => {
+    setSelectedPropertyForVisits(propertyId);
+    setIsReceivedVisitsModalOpen(true);
   };
 
   const handleCloseEditModal = () => {
@@ -109,6 +117,7 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
                 onEdit={() => handleEditProperty(property.id)}
                 onDelete={() => handleDeleteProperty(property.id)}
                 onViewProposals={() => handleViewProposals(property.id)}
+                onViewVisits={() => handleViewVisits(property.id)}
               />
             ))
           ) : (
@@ -137,6 +146,12 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
         onClose={() => setIsProposalsModalOpen(false)}
         propertyId={selectedPropertyForProposals}
         user={user}
+      />
+
+      <ReceivedVisitsModal
+        isOpen={isReceivedVisitsModalOpen}
+        onClose={() => setIsReceivedVisitsModalOpen(false)}
+        propertyId={selectedPropertyForVisits}
       />
     </>
   );

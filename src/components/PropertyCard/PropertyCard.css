@@ -193,4 +193,25 @@
   background: #0056b3;
 }
 
+.property-card-actions > button {
+  width: 25%; /* Adjust for 4 buttons */
+}
+
+.property-view-visits-btn {
+  background: #00a868; /* Primary button color */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+
+.property-view-visits-btn:hover {
+  background: #008c56; /* Darker primary color on hover */
+}
+
 

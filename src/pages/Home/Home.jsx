@@ -84,8 +84,8 @@ function Home() {
   };
 
   const handleLogout = () => {
+    authService.logout(); // Call the service function to clear localStorage and cookie
     setUser(null);
-    localStorage.removeItem('user');
     setIsLoginModalOpen(true);
   };
 

@@ -321,7 +321,9 @@ export const authService = {
       throw error; // Re-throw to ensure finally block is still executed after this.
     } finally {
       localStorage.removeItem('user');
-      console.log('🗑️ User removed from localStorage.');
+      // Explicitly remove the access_token cookie
+      document.cookie = "access_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      console.log('🗑️ User removed from localStorage and access_token cookie cleared.');
     }
   },
 

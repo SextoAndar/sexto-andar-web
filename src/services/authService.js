@@ -208,7 +208,8 @@ export const authService = {
 
     if (userFromLocalStorage && userFromLocalStorage.access_token) {
       authHeader = { 'Authorization': `Bearer ${userFromLocalStorage.access_token}` };
-      console.log(`🔑 Access token found in localStorage: ${userFromLocalStorage.access_token.substring(0, 10)}...`);
+      console.log(`🔑 Full Access Token from localStorage (WARNING: Do not log in production!): ${userFromLocalStorage.access_token}`);
+      console.log(`➡️ Full Authorization Header Value SENT: ${authHeader['Authorization']}`); // New line for clarity
     } else {
       console.log('⚠️ No access token found in localStorage for /me request.');
     }

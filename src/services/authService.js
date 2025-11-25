@@ -184,8 +184,8 @@ export const authService = {
   // Atualizar perfil
   async updateProfile(profileData) {
     try {
-      const user = this.getUser();
-      if (!user || !user.access_token) {
+      const currentUser = this.getUser();
+      if (!currentUser || !currentUser.access_token) {
         throw new Error('No access token found in local storage.');
       }
 
@@ -193,7 +193,7 @@ export const authService = {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.access_token}`
+          'Authorization': `Bearer ${currentUser.access_token}`
         },
         credentials: 'include',
         body: JSON.stringify(profileData),
@@ -207,9 +207,9 @@ export const authService = {
         throw new Error(error.detail || 'Falha ao atualizar perfil');
       }
 
-      const user = await response.json();
-      localStorage.setItem('user', JSON.stringify(user));
-      return user;
+      const updatedUser = await response.json();
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      return updatedUser;
     } catch (error) {
       console.error('Erro ao atualizar perfil:', error);
       throw error;

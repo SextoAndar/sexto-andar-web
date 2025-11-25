@@ -217,7 +217,6 @@ export const authService = {
     console.log(`➡️ Request Headers: ${JSON.stringify(authHeader)}`);
 
     try {
-    try {
       const response = await fetch(endpoint, {
         method: 'GET',
         headers: authHeader,

@@ -206,16 +206,17 @@ export const authService = {
   // Busca dados do usuário logado
   async getMe() {
     const endpoint = `${API_URL}/me`;
-    let userFromLocalStorage = this.getUser();
+    let userFromLocalStorage = this.getUser(); // Check for existing user BEFORE fetch
     let authHeader = {};
+    const wasAuthenticatedAttempt = userFromLocalStorage && userFromLocalStorage.access_token; // <--- THIS LINE MUST BE PRESENT
 
     console.log('-------------------- GET ME INITIATED --------------------');
     console.log(`🔍 Attempting to fetch user details from ${endpoint}`);
 
-    if (userFromLocalStorage && userFromLocalStorage.access_token) {
+    if (wasAuthenticatedAttempt) {
       authHeader = { 'Authorization': `Bearer ${userFromLocalStorage.access_token}` };
       console.log(`🔑 Full Access Token from localStorage (WARNING: Do not log in production!): ${userFromLocalStorage.access_token}`);
-      console.log(`➡️ Full Authorization Header Value SENT: ${authHeader['Authorization']}`); // New line for clarity
+      console.log(`➡️ Full Authorization Header Value SENT: ${authHeader['Authorization']}`);
     } else {
       console.log('⚠️ No access token found in localStorage for /me request.');
     }
@@ -250,7 +251,7 @@ export const authService = {
       // ONLY update localStorage if an authenticated call was made and successful.
       // If no token was originally found, and it still got 200 OK, it's a public endpoint fetch,
       // and we shouldn't overwrite the authenticated user's data from login.
-      if (wasAuthenticatedAttempt) { // If an access_token was used for this request
+      if (wasAuthenticatedAttempt) {
         const existingUser = this.getUser(); // Re-fetch to ensure latest state
         const updatedUserToStore = {
           ...(existingUser || {}),

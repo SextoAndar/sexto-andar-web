@@ -102,56 +102,65 @@ export const authService = {
     },
   // Login
   async login(credentials) {
+    const endpoint = `${API_URL}/login`;
+    const requestBody = {
+      username: credentials.username,
+      password: credentials.password
+    };
+    const requestHeaders = {
+      'Content-Type': 'application/json',
+    };
+
+    console.log('-------------------- LOGIN INITIATED --------------------');
+    console.log(`🔐 Initiating login for user: ${credentials.username}`);
+    console.log(`➡️ Requesting POST ${endpoint}`);
+    console.log(`➡️ Request Headers: ${JSON.stringify(requestHeaders)}`);
+    console.log(`➡️ Request Body: ${JSON.stringify({ ...requestBody, password: '[REDACTED]' })}`);
+
     try {
-      console.log('🔐 Iniciando login para:', credentials.username);
-      console.log('➡️ Request to /login:', {
+      const response = await fetch(endpoint, {
         method: 'POST',
-        url: `${API_URL}/login`,
-        headers: { 'Content-Type': 'application/json' },
-        body: { username: credentials.username, password: '[REDACTED]' }, // Sanitize password
+        headers: requestHeaders,
+        credentials: 'include', // Important for cookies
+        body: JSON.stringify(requestBody),
       });
 
-      const response = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          username: credentials.username,
-          password: credentials.password
-        }),
-      });
+      console.log(`📡 Response Status: ${response.status} ${response.statusText}`);
+      console.log(`📡 Response Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
 
-      console.log('📡 Response from /login:', {
-        status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries()),
-      });
+      const responseBody = await response.json().catch(() => null); // Try to parse, ignore if not JSON
 
       if (!response.ok) {
-        let errorDetails = `Erro ${response.status} (${response.statusText})`;
-        try {
-          const error = await response.json();
-          errorDetails = error.detail || JSON.stringify(error);
-          console.error('❌ Login failed with error details:', error);
-        } catch (e) {
-          console.error('❌ Login failed, could not parse error response:', e);
+        let errorMessage = `Login failed for user ${credentials.username}. Status: ${response.status} ${response.statusText}.`;
+        if (responseBody) {
+          errorMessage += ` Details: ${JSON.stringify(responseBody)}`;
+          console.error(`❌ Login failed! Raw error response:`, responseBody);
+        } else {
+          console.error(`❌ Login failed! No parsable error response body.`);
         }
-        throw new Error(`Login failed: ${errorDetails}`);
+        console.error(errorMessage);
+        throw new Error(responseBody?.detail || errorMessage);
       }
 
-      const data = await response.json();
-      console.log('✅ Login bem-sucedido! Dados recebidos:', data);
+      console.log('✅ Login successful! Data received:', responseBody);
       
-      if (data.user) {
-        localStorage.setItem('user', JSON.stringify(data.user));
-        console.log('💾 Usuário salvo no localStorage');
+      if (responseBody && responseBody.user) {
+        localStorage.setItem('user', JSON.stringify(responseBody.user));
+        console.log('💾 User data saved to localStorage:', responseBody.user);
+        if (responseBody.access_token) {
+          // Assuming access_token is directly in the response body alongside user
+          // If the API sends access_token, it should be stored and used for Authorization header.
+          // This specific commit doesn't use access_token directly, but the older one did.
+          // For now, I'll log its presence.
+          console.log(`🔑 Access token received: ${responseBody.access_token.substring(0, 10)}...`);
+        }
+      } else {
+        console.log('⚠️ No user data in login response or access_token in local storage after login.');
       }
-
-      return data;
+      console.log('-------------------- LOGIN ENDED --------------------');
+      return responseBody;
     } catch (error) {
-      console.error('❌ Erro no login:', error);
+      console.error(`❌ Global error during login for user ${credentials.username}:`, error);
       throw error;
     }
   },
@@ -194,51 +203,54 @@ export const authService = {
 
   // Busca dados do usuário logado
   async getMe() {
+    const endpoint = `${API_URL}/me`;
+    let userFromLocalStorage = this.getUser();
+    let authHeader = {};
+
+    console.log('-------------------- GET ME INITIATED --------------------');
+    console.log(`🔍 Attempting to fetch user details from ${endpoint}`);
+
+    if (userFromLocalStorage && userFromLocalStorage.access_token) {
+      authHeader = { 'Authorization': `Bearer ${userFromLocalStorage.access_token}` };
+      console.log(`🔑 Access token found in localStorage: ${userFromLocalStorage.access_token.substring(0, 10)}...`);
+    } else {
+      console.log('⚠️ No access token found in localStorage for /me request.');
+    }
+
+    console.log(`➡️ Requesting GET ${endpoint}`);
+    console.log(`➡️ Request Headers: ${JSON.stringify(authHeader)}`);
+
     try {
-      const user = this.getUser();
-      if (!user || !user.access_token) {
-        console.log('➡️ Request to /me: No access token found in local storage.');
-        throw new Error('No access token found in local storage.');
-      }
-
-      console.log('➡️ Request to /me:', {
+    try {
+      const response = await fetch(endpoint, {
         method: 'GET',
-        url: `${API_URL}/me`,
-        headers: { 'Authorization': `Bearer ${user.access_token.substring(0, 10)}...` }, // Sanitize token
-      });
-
-      const response = await fetch(`${API_URL}/me`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${user.access_token}`
-        },
+        headers: authHeader,
         credentials: 'include',
       });
 
-      console.log('📡 Response from /me:', {
-        status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries()),
-      });
+      console.log(`📡 Response Status: ${response.status} ${response.statusText}`);
+      console.log(`📡 Response Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
+
+      const responseBody = await response.json().catch(() => null); // Try to parse, ignore if not JSON
 
       if (!response.ok) {
-        let errorDetails = `Erro ${response.status} (${response.statusText})`;
-        try {
-          const error = await response.json();
-          errorDetails = JSON.stringify(error);
-          console.error('❌ Failed to fetch user details with error details:', error);
-        } catch (e) {
-          console.error('❌ Failed to fetch user details, could not parse error response:', e);
+        let errorMessage = `Failed to fetch user details. Status: ${response.status} ${response.statusText}.`;
+        if (responseBody) {
+          errorMessage += ` Details: ${JSON.stringify(responseBody)}`;
+          console.error(`❌ Failed to fetch user details! Raw error response:`, responseBody);
+        } else {
+          console.error(`❌ Failed to fetch user details! No parsable error response body.`);
         }
-        throw new Error(`Não autenticado: ${errorDetails}`);
+        console.error(errorMessage);
+        throw new Error(`Não autenticado: ${responseBody?.detail || errorMessage}`);
       }
 
-      const updatedUser = await response.json();
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      console.log('✅ User details fetched successfully:', updatedUser);
-      return updatedUser;
+      localStorage.setItem('user', JSON.stringify(responseBody));
+      console.log('✅ User details fetched and saved to localStorage:', responseBody);
+      console.log('-------------------- GET ME ENDED --------------------');
+      return responseBody;
     } catch (error) {
-      console.error('❌ Erro ao buscar usuário:', error);
+      console.error(`❌ Global error during getMe request:`, error);
       throw error;
     }
   },

@@ -5,8 +5,8 @@ const API_URL = '/auth/v1/auth';
 export const authService = {
     // Upload de foto de perfil
     async uploadProfilePicture(file) {
-      const user = this.getUser();
-      if (!user || !user.access_token) {
+      const currentUser = this.getUser();
+      if (!currentUser || !currentUser.access_token) {
         throw new Error('No access token found in local storage.');
       }
 
@@ -15,7 +15,7 @@ export const authService = {
       const response = await fetch(`${API_URL}/profile/picture`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${user.access_token}`
+          'Authorization': `Bearer ${currentUser.access_token}`
         },
         credentials: 'include',
         body: formData // NÃO definir Content-Type, o browser faz isso
@@ -25,21 +25,21 @@ export const authService = {
         throw new Error(data.detail || 'Erro ao enviar foto de perfil');
       }
       // Atualiza user local
-      const user = await this.getMe();
-      return { ...data, user };
+      const updatedUser = await this.getMe();
+      return { ...data, user: updatedUser };
     },
 
     // Remover foto de perfil
     async deleteProfilePicture() {
-      const user = this.getUser();
-      if (!user || !user.access_token) {
+      const currentUser = this.getUser();
+      if (!currentUser || !currentUser.access_token) {
         throw new Error('No access token found in local storage.');
       }
 
       const response = await fetch(`${API_URL}/profile/picture`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${user.access_token}`
+          'Authorization': `Bearer ${currentUser.access_token}`
         },
         credentials: 'include',
       });
@@ -48,8 +48,8 @@ export const authService = {
         throw new Error(data.detail || 'Erro ao remover foto de perfil');
       }
       // Atualiza user local
-      const user = await this.getMe();
-      return { ...data, user };
+      const updatedUser = await this.getMe();
+      return { ...data, user: updatedUser };
     },
   // Login
   async login(credentials) {

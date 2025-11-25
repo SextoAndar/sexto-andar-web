@@ -7,8 +7,16 @@ export const authService = {
     async uploadProfilePicture(file) {
       const currentUser = this.getUser();
       if (!currentUser || !currentUser.access_token) {
+        console.log('➡️ Request to /profile/picture: No access token found in local storage.');
         throw new Error('No access token found in local storage.');
       }
+
+      console.log('➡️ Request to /profile/picture:', {
+        method: 'POST',
+        url: `${API_URL}/profile/picture`,
+        headers: { 'Authorization': `Bearer ${currentUser.access_token.substring(0, 10)}...` }, // Sanitize token
+        body: '[FORM_DATA]' // FormData cannot be easily logged
+      });
 
       const formData = new FormData();
       formData.append('file', file);
@@ -20,10 +28,27 @@ export const authService = {
         credentials: 'include',
         body: formData // NÃO definir Content-Type, o browser faz isso
       });
-      const data = await response.json();
+
+      console.log('📡 Response from /profile/picture:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+      });
+
       if (!response.ok) {
-        throw new Error(data.detail || 'Erro ao enviar foto de perfil');
+        let errorDetails = `Erro ${response.status} (${response.statusText})`;
+        try {
+          const error = await response.json();
+          errorDetails = JSON.stringify(error);
+          console.error('❌ Failed to upload profile picture with error details:', error);
+        } catch (e) {
+          console.error('❌ Failed to upload profile picture, could not parse error response:', e);
+        }
+        throw new Error(`Erro ao enviar foto de perfil: ${errorDetails}`);
       }
+
+      const data = await response.json();
+      console.log('✅ Profile picture uploaded successfully! Data received:', data);
       // Atualiza user local
       const updatedUser = await this.getMe();
       return { ...data, user: updatedUser };
@@ -33,8 +58,15 @@ export const authService = {
     async deleteProfilePicture() {
       const currentUser = this.getUser();
       if (!currentUser || !currentUser.access_token) {
+        console.log('➡️ Request to /profile/picture (DELETE): No access token found in local storage.');
         throw new Error('No access token found in local storage.');
       }
+
+      console.log('➡️ Request to /profile/picture (DELETE):', {
+        method: 'DELETE',
+        url: `${API_URL}/profile/picture`,
+        headers: { 'Authorization': `Bearer ${currentUser.access_token.substring(0, 10)}...` }, // Sanitize token
+      });
 
       const response = await fetch(`${API_URL}/profile/picture`, {
         method: 'DELETE',
@@ -43,10 +75,27 @@ export const authService = {
         },
         credentials: 'include',
       });
-      const data = await response.json();
+
+      console.log('📡 Response from /profile/picture (DELETE):', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+      });
+
       if (!response.ok) {
-        throw new Error(data.detail || 'Erro ao remover foto de perfil');
+        let errorDetails = `Erro ${response.status} (${response.statusText})`;
+        try {
+          const error = await response.json();
+          errorDetails = JSON.stringify(error);
+          console.error('❌ Failed to delete profile picture with error details:', error);
+        } catch (e) {
+          console.error('❌ Failed to delete profile picture, could not parse error response:', e);
+        }
+        throw new Error(`Erro ao remover foto de perfil: ${errorDetails}`);
       }
+
+      const data = await response.json();
+      console.log('✅ Profile picture deleted successfully! Data received:', data);
       // Atualiza user local
       const updatedUser = await this.getMe();
       return { ...data, user: updatedUser };
@@ -55,29 +104,41 @@ export const authService = {
   async login(credentials) {
     try {
       console.log('🔐 Iniciando login para:', credentials.username);
-      
+      console.log('➡️ Request to /login:', {
+        method: 'POST',
+        url: `${API_URL}/login`,
+        headers: { 'Content-Type': 'application/json' },
+        body: { username: credentials.username, password: '[REDACTED]' }, // Sanitize password
+      });
+
       const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Importante para cookies
+        credentials: 'include',
         body: JSON.stringify({
           username: credentials.username,
           password: credentials.password
         }),
       });
 
-      console.log('📡 Status do login:', response.status);
+      console.log('📡 Response from /login:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+      });
 
       if (!response.ok) {
-        // Tenta ler o erro como JSON, mas se falhar, usa o status text
+        let errorDetails = `Erro ${response.status} (${response.statusText})`;
         try {
           const error = await response.json();
-          throw new Error(error.detail || `Erro ${response.status}`);
+          errorDetails = error.detail || JSON.stringify(error);
+          console.error('❌ Login failed with error details:', error);
         } catch (e) {
-          throw new Error(response.statusText || `Erro ${response.status}`);
+          console.error('❌ Login failed, could not parse error response:', e);
         }
+        throw new Error(`Login failed: ${errorDetails}`);
       }
 
       const data = await response.json();
@@ -134,28 +195,50 @@ export const authService = {
   // Busca dados do usuário logado
   async getMe() {
     try {
-      const user = this.getUser(); // Get user from localStorage
+      const user = this.getUser();
       if (!user || !user.access_token) {
+        console.log('➡️ Request to /me: No access token found in local storage.');
         throw new Error('No access token found in local storage.');
       }
+
+      console.log('➡️ Request to /me:', {
+        method: 'GET',
+        url: `${API_URL}/me`,
+        headers: { 'Authorization': `Bearer ${user.access_token.substring(0, 10)}...` }, // Sanitize token
+      });
 
       const response = await fetch(`${API_URL}/me`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${user.access_token}` // Add Authorization header
+          'Authorization': `Bearer ${user.access_token}`
         },
         credentials: 'include',
       });
 
+      console.log('📡 Response from /me:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+      });
+
       if (!response.ok) {
-        throw new Error('Não autenticado');
+        let errorDetails = `Erro ${response.status} (${response.statusText})`;
+        try {
+          const error = await response.json();
+          errorDetails = JSON.stringify(error);
+          console.error('❌ Failed to fetch user details with error details:', error);
+        } catch (e) {
+          console.error('❌ Failed to fetch user details, could not parse error response:', e);
+        }
+        throw new Error(`Não autenticado: ${errorDetails}`);
       }
 
       const updatedUser = await response.json();
       localStorage.setItem('user', JSON.stringify(updatedUser));
+      console.log('✅ User details fetched successfully:', updatedUser);
       return updatedUser;
     } catch (error) {
-      console.error('Erro ao buscar usuário:', error);
+      console.error('❌ Erro ao buscar usuário:', error);
       throw error;
     }
   },
@@ -167,17 +250,45 @@ export const authService = {
       const headers = {};
       if (user && user.access_token) {
         headers['Authorization'] = `Bearer ${user.access_token}`;
+        console.log('➡️ Request to /logout:', {
+          method: 'POST',
+          url: `${API_URL}/logout`,
+          headers: { 'Authorization': `Bearer ${user.access_token.substring(0, 10)}...` }, // Sanitize token
+        });
+      } else {
+        console.log('➡️ Request to /logout: No access token found for logout.');
       }
 
-      await fetch(`${API_URL}/logout`, {
+      const response = await fetch(`${API_URL}/logout`, {
         method: 'POST',
         headers: headers,
         credentials: 'include',
       });
+
+      console.log('📡 Response from /logout:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+      });
+
+      if (!response.ok) {
+        let errorDetails = `Erro ${response.status} (${response.statusText})`;
+        try {
+          const error = await response.json();
+          errorDetails = JSON.stringify(error);
+          console.error('❌ Logout failed with error details:', error);
+        } catch (e) {
+          console.error('❌ Logout failed, could not parse error response:', e);
+        }
+        throw new Error(`Erro no logout: ${errorDetails}`);
+      }
+      console.log('✅ Logout successful!');
     } catch (error) {
-      console.error('Erro no logout:', error);
+      console.error('❌ Erro no logout:', error);
+      throw error; // Re-throw to ensure finally block is still executed after this.
     } finally {
       localStorage.removeItem('user');
+      console.log('🗑️ User removed from localStorage.');
     }
   },
 
@@ -186,8 +297,19 @@ export const authService = {
     try {
       const currentUser = this.getUser();
       if (!currentUser || !currentUser.access_token) {
+        console.log('➡️ Request to /profile (PUT): No access token found in local storage.');
         throw new Error('No access token found in local storage.');
       }
+
+      console.log('➡️ Request to /profile (PUT):', {
+        method: 'PUT',
+        url: `${API_URL}/profile`,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentUser.access_token.substring(0, 10)}...` // Sanitize token
+        },
+        body: profileData,
+      });
 
       const response = await fetch(`${API_URL}/profile`, {
         method: 'PUT',
@@ -199,19 +321,33 @@ export const authService = {
         body: JSON.stringify(profileData),
       });
 
+      console.log('📡 Response from /profile (PUT):', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+      });
+
       if (!response.ok) {
-        const error = await response.json();
-        if (response.status === 401) {
-          throw new Error('SESSION_EXPIRED');
+        let errorDetails = `Erro ${response.status} (${response.statusText})`;
+        try {
+          const error = await response.json();
+          errorDetails = JSON.stringify(error);
+          console.error('❌ Failed to update profile with error details:', error);
+        } catch (e) {
+          console.error('❌ Failed to update profile, could not parse error response:', e);
         }
-        throw new Error(error.detail || 'Falha ao atualizar perfil');
+        if (response.status === 401) {
+          throw new Error(`SESSION_EXPIRED: ${errorDetails}`);
+        }
+        throw new Error(`Falha ao atualizar perfil: ${errorDetails}`);
       }
 
       const updatedUser = await response.json();
       localStorage.setItem('user', JSON.stringify(updatedUser));
+      console.log('✅ Profile updated successfully! Data received:', updatedUser);
       return updatedUser;
     } catch (error) {
-      console.error('Erro ao atualizar perfil:', error);
+      console.error('❌ Erro ao atualizar perfil:', error);
       throw error;
     }
   },

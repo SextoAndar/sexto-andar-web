@@ -150,6 +150,12 @@ export const authService = {
         localStorage.setItem('user', JSON.stringify(userToStore));
         console.log('💾 User data (including access_token) saved to localStorage:', userToStore);
         console.log(`🔑 Access token received: ${responseBody.access_token.substring(0, 10)}...`);
+
+        // Set the access_token as a cookie, as per Postman test
+        // WARNING: Manually setting cookies via JS is less secure than HTTP-only cookies
+        const cookieValue = `access_token=${responseBody.access_token}; Path=/; SameSite=Lax;`;
+        document.cookie = cookieValue + (location.protocol === 'https:' ? ' Secure;' : '');
+        console.log('🍪 Access token set as cookie:', cookieValue);
       } else {
         console.log('⚠️ No user data or access_token in login response to save to local storage.');
       }

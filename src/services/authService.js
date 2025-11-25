@@ -233,7 +233,7 @@ export const authService = {
       console.log(`📡 Response Status: ${response.status} ${response.statusText}`);
       console.log(`📡 Response Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
 
-      const responseBody = await response.json().catch(() => null); // Try to parse, ignore if not JSON
+      const responseBody = await response.json().catch(() => null);
 
       if (!response.ok) {
         let errorMessage = `Failed to fetch user details. Status: ${response.status} ${response.statusText}.`;
@@ -247,16 +247,26 @@ export const authService = {
         throw new Error(`Não autenticado: ${responseBody?.detail || errorMessage}`);
       }
 
-      const existingUser = this.getUser(); // Get the current user data from localStorage
-      // Ensure existingUser is not null and has access_token, otherwise handle gracefully
-      const updatedUserToStore = { 
-        ...(existingUser || {}), // Start with existing user data (empty object if null)
-        ...responseBody,      // Merge in new user details from getMe response
-        access_token: existingUser?.access_token, // Preserve existing access_token
-        token_type: existingUser?.token_type // Preserve existing token_type
-      };
-      localStorage.setItem('user', JSON.stringify(updatedUserToStore));
-      console.log('✅ User details fetched and merged with existing token, then saved to localStorage:', updatedUserToStore);
+      // ONLY update localStorage if an authenticated call was made and successful.
+      // If no token was originally found, and it still got 200 OK, it's a public endpoint fetch,
+      // and we shouldn't overwrite the authenticated user's data from login.
+      if (wasAuthenticatedAttempt) { // If an access_token was used for this request
+        const existingUser = this.getUser(); // Re-fetch to ensure latest state
+        const updatedUserToStore = {
+          ...(existingUser || {}),
+          ...responseBody,
+          access_token: existingUser?.access_token,
+          token_type: existingUser?.token_type
+        };
+        localStorage.setItem('user', JSON.stringify(updatedUserToStore));
+        console.log('✅ User details fetched and merged with existing token, then saved to localStorage:', updatedUserToStore);
+      } else {
+        // If no token was sent and we got a 200 OK, it means it's a public user profile.
+        // We should NOT save this to localStorage as 'user' if a proper authenticated user
+        // might exist or is about to exist. This prevents overwriting the access_token.
+        console.log('✅ Public user details fetched (no token used). localStorage not updated to avoid overwriting auth data.');
+        // If you need to store this public user data, it should be in a separate localStorage key or state.
+      }
       console.log('-------------------- GET ME ENDED --------------------');
       return responseBody;
     } catch (error) {

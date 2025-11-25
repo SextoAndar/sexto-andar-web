@@ -5,10 +5,18 @@ const API_URL = '/auth/v1/auth';
 export const authService = {
     // Upload de foto de perfil
     async uploadProfilePicture(file) {
+      const user = this.getUser();
+      if (!user || !user.access_token) {
+        throw new Error('No access token found in local storage.');
+      }
+
       const formData = new FormData();
       formData.append('file', file);
       const response = await fetch(`${API_URL}/profile/picture`, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${user.access_token}`
+        },
         credentials: 'include',
         body: formData // NÃO definir Content-Type, o browser faz isso
       });
@@ -23,8 +31,16 @@ export const authService = {
 
     // Remover foto de perfil
     async deleteProfilePicture() {
+      const user = this.getUser();
+      if (!user || !user.access_token) {
+        throw new Error('No access token found in local storage.');
+      }
+
       const response = await fetch(`${API_URL}/profile/picture`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${user.access_token}`
+        },
         credentials: 'include',
       });
       const data = await response.json();
@@ -118,8 +134,16 @@ export const authService = {
   // Busca dados do usuário logado
   async getMe() {
     try {
+      const user = this.getUser(); // Get user from localStorage
+      if (!user || !user.access_token) {
+        throw new Error('No access token found in local storage.');
+      }
+
       const response = await fetch(`${API_URL}/me`, {
         method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${user.access_token}` // Add Authorization header
+        },
         credentials: 'include',
       });
 
@@ -127,9 +151,9 @@ export const authService = {
         throw new Error('Não autenticado');
       }
 
-      const user = await response.json();
-      localStorage.setItem('user', JSON.stringify(user));
-      return user;
+      const updatedUser = await response.json();
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      return updatedUser;
     } catch (error) {
       console.error('Erro ao buscar usuário:', error);
       throw error;
@@ -139,8 +163,15 @@ export const authService = {
   // Logout
   async logout() {
     try {
+      const user = this.getUser();
+      const headers = {};
+      if (user && user.access_token) {
+        headers['Authorization'] = `Bearer ${user.access_token}`;
+      }
+
       await fetch(`${API_URL}/logout`, {
         method: 'POST',
+        headers: headers,
         credentials: 'include',
       });
     } catch (error) {
@@ -153,9 +184,17 @@ export const authService = {
   // Atualizar perfil
   async updateProfile(profileData) {
     try {
+      const user = this.getUser();
+      if (!user || !user.access_token) {
+        throw new Error('No access token found in local storage.');
+      }
+
       const response = await fetch(`${API_URL}/profile`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.access_token}`
+        },
         credentials: 'include',
         body: JSON.stringify(profileData),
       });

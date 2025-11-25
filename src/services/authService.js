@@ -247,8 +247,16 @@ export const authService = {
         throw new Error(`Não autenticado: ${responseBody?.detail || errorMessage}`);
       }
 
-      localStorage.setItem('user', JSON.stringify(responseBody));
-      console.log('✅ User details fetched and saved to localStorage:', responseBody);
+      const existingUser = this.getUser(); // Get the current user data from localStorage
+      // Ensure existingUser is not null and has access_token, otherwise handle gracefully
+      const updatedUserToStore = { 
+        ...(existingUser || {}), // Start with existing user data (empty object if null)
+        ...responseBody,      // Merge in new user details from getMe response
+        access_token: existingUser?.access_token, // Preserve existing access_token
+        token_type: existingUser?.token_type // Preserve existing token_type
+      };
+      localStorage.setItem('user', JSON.stringify(updatedUserToStore));
+      console.log('✅ User details fetched and merged with existing token, then saved to localStorage:', updatedUserToStore);
       console.log('-------------------- GET ME ENDED --------------------');
       return responseBody;
     } catch (error) {

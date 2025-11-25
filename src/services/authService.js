@@ -144,18 +144,14 @@ export const authService = {
 
       console.log('✅ Login successful! Data received:', responseBody);
       
-      if (responseBody && responseBody.user) {
-        localStorage.setItem('user', JSON.stringify(responseBody.user));
-        console.log('💾 User data saved to localStorage:', responseBody.user);
-        if (responseBody.access_token) {
-          // Assuming access_token is directly in the response body alongside user
-          // If the API sends access_token, it should be stored and used for Authorization header.
-          // This specific commit doesn't use access_token directly, but the older one did.
-          // For now, I'll log its presence.
-          console.log(`🔑 Access token received: ${responseBody.access_token.substring(0, 10)}...`);
-        }
+      if (responseBody && responseBody.access_token && responseBody.user) {
+        // Combine the user details with the access_token for storage
+        const userToStore = { ...responseBody.user, access_token: responseBody.access_token, token_type: responseBody.token_type };
+        localStorage.setItem('user', JSON.stringify(userToStore));
+        console.log('💾 User data (including access_token) saved to localStorage:', userToStore);
+        console.log(`🔑 Access token received: ${responseBody.access_token.substring(0, 10)}...`);
       } else {
-        console.log('⚠️ No user data in login response or access_token in local storage after login.');
+        console.log('⚠️ No user data or access_token in login response to save to local storage.');
       }
       console.log('-------------------- LOGIN ENDED --------------------');
       return responseBody;

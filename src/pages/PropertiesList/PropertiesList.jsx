@@ -4,7 +4,7 @@ import PropertyCard from '../../components/PropertyCard/PropertyCard';
 import PropertyDetailsModal from '../../components/PropertyDetailsModal/PropertyDetailsModal';
 import './PropertiesList.css';
 
-export default function PropertiesList({ user }) {
+export default function PropertiesList({ user, searchTerm }) {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,11 +12,17 @@ export default function PropertiesList({ user }) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   useEffect(() => {
-    fetchProperties()
+    setLoading(true);
+    const params = {};
+    if (searchTerm) {
+      params.search_term = searchTerm;
+    }
+    
+    fetchProperties(params)
       .then(data => setProperties(data.properties))
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [searchTerm]);
 
   const handleOpenDetails = (propertyId) => {
     setSelectedPropertyId(propertyId);

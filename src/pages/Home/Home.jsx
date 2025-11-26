@@ -11,6 +11,10 @@ function Home() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [submittedSearchTerm, setSubmittedSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [submittedSearchTerm, setSubmittedSearchTerm] = useState('');
 
   const [user, setUser] = useState(authService.getUser());
   useEffect(() => {
@@ -89,6 +93,10 @@ function Home() {
     setIsLoginModalOpen(true);
   };
 
+  const handleSearch = () => {
+    setSubmittedSearchTerm(searchTerm);
+  };
+
   return (
     <div className="home-page">
       <Header 
@@ -108,12 +116,15 @@ function Home() {
               type="text" 
               placeholder="Buscar por cidade ou bairro" 
               className="search-input"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyUp={(e) => e.key === 'Enter' && handleSearch()}
             />
-            <button className="search-button">Buscar Imóveis</button>
+            <button className="search-button" onClick={handleSearch}>Buscar Imóveis</button>
           </div>
         </section>
 
-        <PropertiesList user={user} />
+        <PropertiesList user={user} searchTerm={submittedSearchTerm} />
       </main>
 
       <Modal 

@@ -76,3 +76,11 @@
   color: #00a868;
   text-decoration: underline;
 }
+
+.error-message-text {
+  color: #e74c3c; /* A strong red color for error messages */
+  font-size: 0.85rem;
+  margin-top: -0.5rem; /* Adjust spacing to be closer to the input */
+  margin-bottom: 0.5rem;
+  text-align: left;
+}

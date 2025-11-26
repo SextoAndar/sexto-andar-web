@@ -11,6 +11,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
     username: '',
     password: ''
   });
+  const [loginErrors, setLoginErrors] = useState({});
   const [signupData, setSignupData] = useState({
     username: '',
     fullName: '',
@@ -20,10 +21,31 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
     password: '',
     acceptTerms: false
   });
+  const [signupErrors, setSignupErrors] = useState({});
 
   const loginUsernameRef = useRef(null);
   const loginPasswordRef = useRef(null);
   const signupPasswordRef = useRef(null);
+
+  const validateUsername = (username) => {
+    if (username.length < 3) {
+      return 'Mínimo de 3 caracteres.';
+    }
+    if (username.length > 50) {
+      return 'Máximo de 50 caracteres.';
+    }
+    if (!/^[a-zA-Z0-9_]*$/.test(username)) {
+      return 'Apenas letras, números e underscore (_).';
+    }
+    return ''; // No error
+  };
+
+  const validatePassword = (password) => {
+    if (password.length < 8) {
+      return 'Mínimo de 8 caracteres.';
+    }
+    return ''; // No error
+  };
 
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
@@ -31,6 +53,11 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
       ...prev,
       [name]: value
     }));
+
+    if (name === 'username') {
+      const error = validateUsername(value);
+      setLoginErrors(prev => ({ ...prev, username: error }));
+    }
   };
 
   const handleSignupChange = (e) => {
@@ -39,11 +66,27 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+
+    if (name === 'username') {
+      const error = validateUsername(value);
+      setSignupErrors(prev => ({ ...prev, username: error }));
+    }
+    if (name === 'password') {
+      const error = validatePassword(value);
+      setSignupErrors(prev => ({ ...prev, password: error }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (activeTab === 'login') {
+      const usernameError = validateUsername(loginData.username);
+      if (usernameError) {
+        setLoginErrors(prev => ({ ...prev, username: usernameError }));
+        return;
+      }
+
       const finalLoginData = { ...loginData };
       const usernameFromDOM = loginUsernameRef.current.value;
       const passwordFromDOM = loginPasswordRef.current.value;
@@ -55,7 +98,25 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
         finalLoginData.password = passwordFromDOM;
       }
       onSubmit(finalLoginData);
-    } else {
+    } else { // activeTab === 'signup'
+      const usernameError = validateUsername(signupData.username);
+      const passwordError = validatePassword(signupData.password);
+      const acceptTermsError = signupData.acceptTerms ? '' : 'Você deve aceitar os termos de uso.';
+
+      // Combine all signup errors for pre-submission validation
+      const newSignupErrors = {
+        username: usernameError,
+        password: passwordError,
+        acceptTerms: acceptTermsError,
+        // Add other field validations here as needed
+      };
+      setSignupErrors(newSignupErrors);
+
+      // Check if any critical errors exist
+      if (usernameError || passwordError || acceptTermsError || !signupData.acceptTerms) {
+        return;
+      }
+
       // Garante que a senha do preenchimento automático seja capturada
       const finalSignupData = { ...signupData };
       const passwordFromDOM = signupPasswordRef.current.value;
@@ -65,6 +126,9 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
       onSubmit(finalSignupData);
     }
   };
+
+  const isLoginButtonDisabled = isLoading || !!loginErrors.username;
+  const isSignupButtonDisabled = isLoading || !!signupErrors.username || !!signupErrors.password || !!signupErrors.acceptTerms || !signupData.acceptTerms;
 
   const userTypeOptions = [
     { value: 'Inquilino', label: 'Inquilino' },
@@ -108,6 +172,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             autoComplete="username"
             ref={loginUsernameRef}
           />
+          {loginErrors.username && <div className="error-message-text">{loginErrors.username}</div>}
           <Input
             type="password"
             label="Senha"
@@ -119,7 +184,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             autoComplete="current-password"
             ref={loginPasswordRef}
           />
-          <Button type="submit" variant="primary" disabled={isLoading}>
+          <Button type="submit" variant="primary" disabled={isLoginButtonDisabled}>
             {isLoading ? 'Entrando...' : 'Entrar'}
           </Button>
         </form>
@@ -135,6 +200,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             required
             autoComplete="username"
           />
+          {signupErrors.username && <div className="error-message-text">{signupErrors.username}</div>}
           <Input
             type="text"
             label="Nome Completo"
@@ -184,6 +250,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             autoComplete="new-password"
             ref={signupPasswordRef}
           />
+          {signupErrors.password && <div className="error-message-text">{signupErrors.password}</div>}
           <Checkbox
             name="acceptTerms"
             checked={signupData.acceptTerms}
@@ -195,7 +262,8 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             }
             required
           />
-          <Button type="submit" variant="primary" disabled={isLoading}>
+          {signupErrors.acceptTerms && <div className="error-message-text">{signupErrors.acceptTerms}</div>}
+          <Button type="submit" variant="primary" disabled={isSignupButtonDisabled}>
             {isLoading ? 'Criando...' : 'Criar Conta'}
           </Button>
         </form>

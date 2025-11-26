@@ -100,6 +100,7 @@ function EditProfileForm({ user, onSave, onCancel }) {
         value={formData.phoneNumber}
         onChange={handleChange}
         required
+        autoComplete="tel"
       />
 
       <Input
@@ -109,6 +110,7 @@ function EditProfileForm({ user, onSave, onCancel }) {
         value={formData.email}
         onChange={handleChange}
         required
+        autoComplete="email"
       />
 
       <div className="password-section">

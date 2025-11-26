@@ -89,7 +89,7 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
 
           <nav className="header-nav">
             {(!user || (user.role !== 'PROPERTY_OWNER' && user.role !== 'ADMIN')) && (
-              <a href="#" className="nav-link">
+              <a href="#" className="nav-link" onClick={!user ? onLoginClick : undefined}>
                 <span className="nav-icon">🏠</span>
                 Alugar
               </a>

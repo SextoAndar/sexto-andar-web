@@ -36,6 +36,13 @@ export default function PropertiesList({ user, searchTerm }) {
 
   if (loading) return <div className="properties-list-loading">Carregando imóveis...</div>;
   if (error) return <div className="properties-list-error">Erro: {error}</div>;
+  if (!loading && !error && properties.length === 0) {
+    return (
+      <div className="properties-list-empty">
+        Nenhum imóvel encontrado para sua busca. Tente outros termos.
+      </div>
+    );
+  }
 
   return (
     <div className="properties-list-container">

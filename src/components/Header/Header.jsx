@@ -110,16 +110,12 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
                   <span className="nav-icon">✉️</span>
                   Propostas Recebidas
                 </a>
-                <a href="#" className="nav-link" onClick={handleReceivedVisitsClick}>
+                <a href="#" className="nav-link" onClick={handleReceivedVisitsModalOpen}>
                   <span className="nav-icon">🗓️</span>
                   Visitas Recebidas
                 </a>
               </>
             )}
-            <a href="#" className="nav-link">
-              <span className="nav-icon">🔍</span>
-              Buscar
-            </a>
             {user && user.role === 'USER' && (
               <>
                 <a href="#" className="nav-link" onClick={handleFavoritesClick}>

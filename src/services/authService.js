@@ -194,21 +194,28 @@ export const authService = {
         body: JSON.stringify(bodyData),
       });
 
-      if (!response.ok) {
-        const errorBody = await response.clone().json().catch(() => null);
-        let publicErrorMessage = errorBody?.detail || `Erro ${response.status}: ${response.statusText}`;
-        let fullErrorText = `Endpoint: ${endpoint}\nMensagem: ${publicErrorMessage}\n\n--- Resposta do Servidor ---\n`;
+      // --- Centralized Response Parsing and Logging ---
+      const textResponse = await response.text(); // Sempre obtém o texto bruto da resposta primeiro
+      let jsonResponse = null;
 
-        if (errorBody) {
-          console.error('❌ Erro no cadastro! Resposta de erro do servidor (JSON):', errorBody);
-          fullErrorText += JSON.stringify(errorBody, null, 2);
+      try {
+        jsonResponse = JSON.parse(textResponse);
+        console.log('📡 Resposta do servidor (JSON):', jsonResponse);
+      } catch (parseError) {
+        // Se o parseamento falhar, a resposta não é um JSON válido. Loga o texto bruto.
+        console.error('📡 Resposta do servidor (não-JSON/erro de parseamento):', textResponse);
+      }
+      // --- Fim do Parseamento Centralizado e Logging ---
+
+      if (!response.ok) {
+        let publicErrorMessage = jsonResponse?.detail || `Erro ${response.status}: ${response.statusText}`;
+        let fullErrorText = `Endpoint: ${endpoint}\nMensagem: ${publicErrorMessage}\n\n--- Resposta do Servidor ---\n`;
+        
+        // Adiciona o JSON parseado ou o texto bruto a fullErrorText para o modal
+        if (jsonResponse) {
+          fullErrorText += JSON.stringify(jsonResponse, null, 2);
         } else {
-          const textResponse = await response.text();
-          console.error('❌ Erro no cadastro! Resposta de erro do servidor (não-JSON):', textResponse);
-          console.error('❌ Erro no cadastro! Resposta de erro do servidor (não-JSON):', textResponse);
           fullErrorText += textResponse;
-          // Se a resposta for HTML (como um erro de proxy), o usuário não precisa ver o HTML inteiro.
-          // A mensagem pública permanece mais limpa.
           if (textResponse.trim().startsWith('<!DOCTYPE html>') || textResponse.trim().startsWith('<html>')) {
             publicErrorMessage = `Erro ${response.status}: A resposta do servidor não foi um JSON válido, possivelmente um erro de proxy ou de rede.`;
           }
@@ -218,11 +225,14 @@ export const authService = {
         throw new Error(publicErrorMessage);
       }
 
-      const data = await response.json();
-      localStorage.setItem('user', JSON.stringify(data));
-      return { user: data };
+      // Se response.ok for true e jsonResponse for null, significa que a resposta era 200 OK mas não era JSON.
+      if (jsonResponse === null) {
+         throw new Error(`Resposta inesperada do servidor (200 OK, mas não é JSON): ${textResponse.substring(0, 100)}...`);
+      }
+      localStorage.setItem('user', JSON.stringify(jsonResponse));
+      return { user: jsonResponse }; // Usa jsonResponse
     } catch (error) {
-      console.error('Erro no cadastro:', error);
+      console.error('Erro no cadastro (Global Catch):', error); // Renomeado para clareza
       throw error;
     }
   },

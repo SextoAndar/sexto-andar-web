@@ -13,8 +13,6 @@ function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [submittedSearchTerm, setSubmittedSearchTerm] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [submittedSearchTerm, setSubmittedSearchTerm] = useState('');
 
   const [user, setUser] = useState(authService.getUser());
   useEffect(() => {

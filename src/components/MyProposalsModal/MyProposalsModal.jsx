@@ -6,6 +6,7 @@ import ProposalCard from '../ProposalCard/ProposalCard';
 import { getMyProposals, withdrawProposal, deleteProposal } from '../../services/proposalService';
 import ProposalDetailsModal from '../ProposalDetailsModal/ProposalDetailsModal';
 import Pagination from '../common/Pagination/Pagination'; // Import Pagination component
+import logger from '../../utils/logger'; // Import logger utility
 import './MyProposalsModal.css';
 
 function MyProposalsModal({ isOpen, onClose, user }) {
@@ -28,7 +29,7 @@ function MyProposalsModal({ isOpen, onClose, user }) {
         setTotalPages(0);
       }
     } catch (error) {
-      console.error(error.message);
+      logger.error(error.message);
       setProposals([]);
       setTotalPages(0);
     } finally {

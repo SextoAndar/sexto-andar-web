@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // Corrected React import
 import { Link } from 'react-router-dom';
 import authService from '../../services/authService';
 import { fetchOwnerProperties } from '../../services/propertyService';
+import logger from '../../utils/logger'; // Import logger utility
 import './Header.css';
 import PropertyRegisterModal from '../PropertyRegisterModal/PropertyRegisterModal';
 import OwnerPropertiesModal from '../OwnerPropertiesModal/OwnerPropertiesModal';
@@ -52,7 +53,7 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
       setOwnerProperties(data.properties);
       setIsOwnerPropertiesModalOpen(true);
     } catch (error) {
-      console.error(error.message);
+      logger.error(error.message); // Using logger
       // Handles errors like 401 or other network issues.
       alert(`Ocorreu um erro ao buscar suas propriedades: ${error.message}`);
     }

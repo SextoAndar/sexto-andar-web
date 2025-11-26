@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // Corrected React import
 import Modal from '../common/Modal/Modal';
 import Button from '../common/Button/Button';
 import PropertyCard from '../PropertyCard/PropertyCard';
@@ -8,6 +8,7 @@ import ProposalsModal from '../ProposalsModal/ProposalsModal';
 import ReceivedVisitsModal from '../ReceivedVisitsModal/ReceivedVisitsModal';
 import Pagination from '../common/Pagination/Pagination'; // Import Pagination component
 import { fetchOwnerProperties, deleteProperty } from '../../services/propertyService';
+import logger from '../../utils/logger'; // Import logger utility
 import './OwnerPropertiesModal.css';
 
 function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, user }) {
@@ -33,7 +34,7 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
         setTotalPages(0);
       }
     } catch (error) {
-      console.error(error.message);
+      logger.error(error.message);
       setProperties([]);
       setTotalPages(0);
     }
@@ -57,7 +58,7 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
         await deleteProperty(propertyId);
         loadActiveProperties(currentPage); // Refresh current page
       } catch (error) {
-        console.error(error.message);
+        logger.error(error.message);
         alert(`Erro ao desativar imóvel: ${error.message}`);
       }
     }
@@ -93,19 +94,19 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
   }
 
   const handleImageUpdate = async () => {
-    console.log('handleImageUpdate: Refreshing properties...');
+    logger.log('handleImageUpdate: Refreshing properties...');
     const updatedPropertiesData = await fetchOwnerProperties({ page: currentPage, size: 10 }); // Fetch with pagination
-    console.log('handleImageUpdate: Received properties data:', updatedPropertiesData);
+    logger.log('handleImageUpdate: Received properties data:', updatedPropertiesData);
     
     const updatedProperties = updatedPropertiesData.properties;
     
     setProperties(updatedProperties);
     const refreshedProperty = updatedProperties.find(p => p.id === selectedProperty.id);
     if (refreshedProperty) {
-      console.log('handleImageUpdate: Found updated property, updating state.', refreshedProperty);
+      logger.log('handleImageUpdate: Found updated property, updating state.', refreshedProperty);
       setSelectedProperty(refreshedProperty);
     } else {
-      console.log('handleImageUpdate: Could not find updated property, closing modal.');
+      logger.log('handleImageUpdate: Could not find updated property, closing modal.');
       handleCloseEditModal();
     }
   };

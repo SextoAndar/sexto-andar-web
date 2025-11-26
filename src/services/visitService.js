@@ -1,4 +1,5 @@
 // src/services/visitService.js
+import logger from '../utils/logger';
 
 export async function getVisitsForUser({ page = 1, size = 10, status = '' } = {}) {
   const url = new URL('/api/api/visits/my-visits', window.location.origin);

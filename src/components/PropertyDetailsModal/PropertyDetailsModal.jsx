@@ -5,6 +5,7 @@ import Button from '../common/Button/Button';
 import ProposalFormModal from '../ProposalFormModal/ProposalFormModal';
 import ScheduleVisitModal from '../ScheduleVisitModal/ScheduleVisitModal';
 import Pagination from '../common/Pagination/Pagination'; // Import Pagination component
+import logger from '../../utils/logger'; // Import logger utility
 import './PropertyDetailsModal.css';
 
 const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
@@ -65,7 +66,7 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
           setPublicVisitTotalPages(0);
         }
       } catch (err) {
-        setError(err.message);
+        logger.error(err.message);
         setPublicVisitDates([]);
         setPublicVisitTotalPages(0);
       } finally {
@@ -86,7 +87,7 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
         setIsFavorited(true);
       }
     } catch (err) {
-      setError(err.message);
+      logger.error(err.message);
     }
   };
 

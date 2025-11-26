@@ -4,6 +4,7 @@ import PropertyCard from '../PropertyCard/PropertyCard';
 import { fetchFavoriteProperties, unfavoriteProperty } from '../../services/propertyService';
 import PropertyDetailsModal from '../PropertyDetailsModal/PropertyDetailsModal';
 import Pagination from '../common/Pagination/Pagination'; // Import Pagination component
+import logger from '../../utils/logger'; // Import logger utility
 import './FavoritesModal.css';
 
 function FavoritesModal({ isOpen, onClose, user }) {
@@ -27,7 +28,7 @@ function FavoritesModal({ isOpen, onClose, user }) {
         setTotalPages(0);
       }
     } catch (error) {
-      console.error(error.message);
+      logger.error(error.message);
       setFavorites([]);
       setTotalPages(0);
     } finally {
@@ -46,7 +47,7 @@ function FavoritesModal({ isOpen, onClose, user }) {
       await unfavoriteProperty(propertyId);
       loadFavorites(currentPage);
     } catch (error) {
-      console.error(error.message);
+      logger.error(error.message);
     }
   };
 

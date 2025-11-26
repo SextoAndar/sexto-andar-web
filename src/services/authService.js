@@ -1,4 +1,5 @@
 import errorService from './errorService';
+import logger from '../utils/logger';
 // Serviço de autenticação integrado com sexto-andar-auth
 // Usa proxy do Vite para evitar problemas com cookies cross-origin
 const API_URL = '/auth/v1/auth';
@@ -8,11 +9,11 @@ export const authService = {
     async uploadProfilePicture(file) {
       const currentUser = this.getUser();
       if (!currentUser || !currentUser.access_token) {
-        console.log('➡️ Request to /profile/picture: No access token found in local storage.');
+        logger.log('➡️ Request to /profile/picture: No access token found in local storage.');
         throw new Error('No access token found in local storage.');
       }
 
-      console.log('➡️ Request to /profile/picture:', {
+      logger.log('➡️ Request to /profile/picture:', {
         method: 'POST',
         url: `${API_URL}/profile/picture`,
         headers: { 'Authorization': `Bearer ${currentUser.access_token.substring(0, 10)}...` }, // Sanitize token
@@ -30,7 +31,7 @@ export const authService = {
         body: formData // NÃO definir Content-Type, o browser faz isso
       });
 
-      console.log('📡 Response from /profile/picture:', {
+      logger.log('📡 Response from /profile/picture:', {
         status: response.status,
         statusText: response.statusText,
         headers: Object.fromEntries(response.headers.entries()),
@@ -41,15 +42,15 @@ export const authService = {
         try {
           const error = await response.json();
           errorDetails = JSON.stringify(error);
-          console.error('❌ Failed to upload profile picture with error details:', error);
+          logger.error('❌ Failed to upload profile picture with error details:', error);
         } catch (e) {
-          console.error('❌ Failed to upload profile picture, could not parse error response:', e);
+          logger.error('❌ Failed to upload profile picture, could not parse error response:', e);
         }
         throw new Error(`Erro ao enviar foto de perfil: ${errorDetails}`);
       }
 
       const data = await response.json();
-      console.log('✅ Profile picture uploaded successfully! Data received:', data);
+      logger.log('✅ Profile picture uploaded successfully! Data received:', data);
       // Atualiza user local
       const updatedUser = await this.getMe();
       return { ...data, user: updatedUser };
@@ -59,11 +60,11 @@ export const authService = {
     async deleteProfilePicture() {
       const currentUser = this.getUser();
       if (!currentUser || !currentUser.access_token) {
-        console.log('➡️ Request to /profile/picture (DELETE): No access token found in local storage.');
+        logger.log('➡️ Request to /profile/picture (DELETE): No access token found in local storage.');
         throw new Error('No access token found in local storage.');
       }
 
-      console.log('➡️ Request to /profile/picture (DELETE):', {
+      logger.log('➡️ Request to /profile/picture (DELETE):', {
         method: 'DELETE',
         url: `${API_URL}/profile/picture`,
         headers: { 'Authorization': `Bearer ${currentUser.access_token.substring(0, 10)}...` }, // Sanitize token
@@ -77,7 +78,7 @@ export const authService = {
         credentials: 'include',
       });
 
-      console.log('📡 Response from /profile/picture (DELETE):', {
+      logger.log('📡 Response from /profile/picture (DELETE):', {
         status: response.status,
         statusText: response.statusText,
         headers: Object.fromEntries(response.headers.entries()),
@@ -88,15 +89,15 @@ export const authService = {
         try {
           const error = await response.json();
           errorDetails = JSON.stringify(error);
-          console.error('❌ Failed to delete profile picture with error details:', error);
+          logger.error('❌ Failed to delete profile picture with error details:', error);
         } catch (e) {
-          console.error('❌ Failed to delete profile picture, could not parse error response:', e);
+          logger.error('❌ Failed to delete profile picture, could not parse error response:', e);
         }
         throw new Error(`Erro ao remover foto de perfil: ${errorDetails}`);
       }
 
       const data = await response.json();
-      console.log('✅ Profile picture deleted successfully! Data received:', data);
+      logger.log('✅ Profile picture deleted successfully! Data received:', data);
       // Atualiza user local
       const updatedUser = await this.getMe();
       return { ...data, user: updatedUser };
@@ -112,11 +113,11 @@ export const authService = {
       'Content-Type': 'application/json',
     };
 
-    console.log('-------------------- LOGIN INITIATED --------------------');
-    console.log(`🔐 Initiating login for user: ${credentials.username}`);
-    console.log(`➡️ Requesting POST ${endpoint}`);
-    console.log(`➡️ Request Headers: ${JSON.stringify(requestHeaders)}`);
-    console.log(`➡️ Request Body: ${JSON.stringify({ ...requestBody, password: '[REDACTED]' })}`);
+    logger.log('-------------------- LOGIN INITIATED --------------------');
+    logger.log(`🔐 Initiating login for user: ${credentials.username}`);
+    logger.log(`➡️ Requesting POST ${endpoint}`);
+    logger.log(`➡️ Request Headers: ${JSON.stringify(requestHeaders)}`);
+    logger.log(`➡️ Request Body: ${JSON.stringify({ ...requestBody, password: '[REDACTED]' })}`);
 
     try {
       const response = await fetch(endpoint, {
@@ -126,8 +127,8 @@ export const authService = {
         body: JSON.stringify(requestBody),
       });
 
-      console.log(`📡 Response Status: ${response.status} ${response.statusText}`);
-      console.log(`📡 Response Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
+      logger.log(`📡 Response Status: ${response.status} ${response.statusText}`);
+      logger.log(`📡 Response Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
 
       const responseBody = await response.json().catch(() => null); // Try to parse, ignore if not JSON
 
@@ -135,35 +136,35 @@ export const authService = {
         let errorMessage = `Login failed for user ${credentials.username}. Status: ${response.status} ${response.statusText}.`;
         if (responseBody) {
           errorMessage += ` Details: ${JSON.stringify(responseBody)}`;
-          console.error(`❌ Login failed! Raw error response:`, responseBody);
+          logger.error(`❌ Login failed! Raw error response:`, responseBody);
         } else {
-          console.error(`❌ Login failed! No parsable error response body.`);
+          logger.error(`❌ Login failed! No parsable error response body.`);
         }
-        console.error(errorMessage);
+        logger.error(errorMessage);
         throw new Error(responseBody?.detail || errorMessage);
       }
 
-      console.log('✅ Login successful! Data received:', responseBody);
+      logger.log('✅ Login successful! Data received:', responseBody);
       
       if (responseBody && responseBody.access_token && responseBody.user) {
         // Combine the user details with the access_token for storage
         const userToStore = { ...responseBody.user, access_token: responseBody.access_token, token_type: responseBody.token_type };
         localStorage.setItem('user', JSON.stringify(userToStore));
-        console.log('💾 User data (including access_token) saved to localStorage:', userToStore);
-        console.log(`🔑 Access token received: ${responseBody.access_token.substring(0, 10)}...`);
+        logger.log('💾 User data (including access_token) saved to localStorage:', userToStore);
+        logger.log(`🔑 Access token received: ${responseBody.access_token.substring(0, 10)}...`);
 
         // Set the access_token as a cookie, as per Postman test
         // WARNING: Manually setting cookies via JS is less secure than HTTP-only cookies
         const cookieValue = `access_token=${responseBody.access_token}; Path=/; SameSite=Lax;`;
         document.cookie = cookieValue + (location.protocol === 'https:' ? ' Secure;' : '');
-        console.log('🍪 Access token set as cookie:', cookieValue);
+        logger.log('🍪 Access token set as cookie:', cookieValue);
       } else {
-        console.log('⚠️ No user data or access_token in login response to save to local storage.');
+        logger.log('⚠️ No user data or access_token in login response to save to local storage.');
       }
-      console.log('-------------------- LOGIN ENDED --------------------');
+      logger.log('-------------------- LOGIN ENDED --------------------');
       return responseBody;
     } catch (error) {
-      console.error(`❌ Global error during login for user ${credentials.username}:`, error);
+      logger.error(`❌ Global error during login for user ${credentials.username}:`, error);
       throw error;
     }
   },
@@ -183,7 +184,7 @@ export const authService = {
         password: userData.password
       };
 
-      console.log('➡️ Request to /register: Payload being sent (for debugging purposes):', bodyData);
+      logger.log('➡️ Request to /register: Payload being sent (for debugging purposes):', bodyData);
       
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -198,14 +199,14 @@ export const authService = {
       const textResponse = await response.text(); // Sempre obtém o texto bruto da resposta primeiro
       let jsonResponse = null;
 
-      console.log('📡 Resposta bruta do servidor (antes do parseamento):', textResponse); // Loga o antes
+      logger.log('📡 Resposta bruta do servidor (antes do parseamento):', textResponse); // Loga o antes
 
       try {
         jsonResponse = JSON.parse(textResponse);
-        console.log('📡 Resposta do servidor (após parseamento JSON):', jsonResponse); // Loga o depois
+        logger.log('📡 Resposta do servidor (após parseamento JSON):', jsonResponse); // Loga o depois
       } catch (parseError) {
         // Se o parseamento falhar, a resposta não é um JSON válido.
-        console.error('📡 Resposta do servidor não é JSON válido (erro de parseamento):', parseError);
+        logger.error('📡 Resposta do servidor não é JSON válido (erro de parseamento):', parseError);
       }
       // --- Fim do Parseamento Centralizado e Logging ---
 
@@ -234,7 +235,7 @@ export const authService = {
       localStorage.setItem('user', JSON.stringify(jsonResponse));
       return { user: jsonResponse }; // Usa jsonResponse
     } catch (error) {
-      console.error('Erro no cadastro (Global Catch):', error); // Renomeado para clareza
+      logger.error('Erro no cadastro (Global Catch):', error); // Renomeado para clareza
       throw error;
     }
   },
@@ -246,19 +247,19 @@ export const authService = {
     let authHeader = {};
     const wasAuthenticatedAttempt = userFromLocalStorage && userFromLocalStorage.access_token; // <--- THIS LINE MUST BE PRESENT
 
-    console.log('-------------------- GET ME INITIATED --------------------');
-    console.log(`🔍 Attempting to fetch user details from ${endpoint}`);
+    logger.log('-------------------- GET ME INITIATED --------------------');
+    logger.log(`🔍 Attempting to fetch user details from ${endpoint}`);
 
     if (wasAuthenticatedAttempt) {
       authHeader = { 'Authorization': `Bearer ${userFromLocalStorage.access_token}` };
-      console.log(`🔑 Full Access Token from localStorage (WARNING: Do not log in production!): ${userFromLocalStorage.access_token}`);
-      console.log(`➡️ Full Authorization Header Value SENT: ${authHeader['Authorization']}`);
+      logger.log(`🔑 Full Access Token from localStorage (WARNING: Do not log in production!): ${userFromLocalStorage.access_token}`);
+      logger.log(`➡️ Full Authorization Header Value SENT: ${authHeader['Authorization']}`);
     } else {
-      console.log('⚠️ No access token found in localStorage for /me request.');
+      logger.log('⚠️ No access token found in localStorage for /me request.');
     }
 
-    console.log(`➡️ Requesting GET ${endpoint}`);
-    console.log(`➡️ Request Headers: ${JSON.stringify(authHeader)}`);
+    logger.log(`➡️ Requesting GET ${endpoint}`);
+    logger.log(`➡️ Request Headers: ${JSON.stringify(authHeader)}`);
 
     try {
       const response = await fetch(endpoint, {
@@ -267,8 +268,8 @@ export const authService = {
         credentials: 'include',
       });
 
-      console.log(`📡 Response Status: ${response.status} ${response.statusText}`);
-      console.log(`📡 Response Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
+      logger.log(`📡 Response Status: ${response.status} ${response.statusText}`);
+      logger.log(`📡 Response Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
 
       const responseBody = await response.json().catch(() => null);
 
@@ -276,11 +277,11 @@ export const authService = {
         let errorMessage = `Failed to fetch user details. Status: ${response.status} ${response.statusText}.`;
         if (responseBody) {
           errorMessage += ` Details: ${JSON.stringify(responseBody)}`;
-          console.error(`❌ Failed to fetch user details! Raw error response:`, responseBody);
+          logger.error(`❌ Failed to fetch user details! Raw error response:`, responseBody);
         } else {
-          console.error(`❌ Failed to fetch user details! No parsable error response body.`);
+          logger.error(`❌ Failed to fetch user details! No parsable error response body.`);
         }
-        console.error(errorMessage);
+        logger.error(errorMessage);
         throw new Error(`Não autenticado: ${responseBody?.detail || errorMessage}`);
       }
 
@@ -296,18 +297,18 @@ export const authService = {
           token_type: existingUser?.token_type
         };
         localStorage.setItem('user', JSON.stringify(updatedUserToStore));
-        console.log('✅ User details fetched and merged with existing token, then saved to localStorage:', updatedUserToStore);
+        logger.log('✅ User details fetched and merged with existing token, then saved to localStorage:', updatedUserToStore);
       } else {
         // If no token was sent and we got a 200 OK, it means it's a public user profile.
         // We should NOT save this to localStorage as 'user' if a proper authenticated user
         // might exist or is about to exist. This prevents overwriting the access_token.
-        console.log('✅ Public user details fetched (no token used). localStorage not updated to avoid overwriting auth data.');
+        logger.log('✅ Public user details fetched (no token used). localStorage not updated to avoid overwriting auth data.');
         // If you need to store this public user data, it should be in a separate localStorage key or state.
       }
-      console.log('-------------------- GET ME ENDED --------------------');
+      logger.log('-------------------- GET ME ENDED --------------------');
       return responseBody;
     } catch (error) {
-      console.error(`❌ Global error during getMe request:`, error);
+      logger.error(`❌ Global error during getMe request:`, error);
       throw error;
     }
   },
@@ -319,13 +320,13 @@ export const authService = {
       const headers = {};
       if (user && user.access_token) {
         headers['Authorization'] = `Bearer ${user.access_token}`;
-        console.log('➡️ Request to /logout:', {
+        logger.log('➡️ Request to /logout:', {
           method: 'POST',
           url: `${API_URL}/logout`,
           headers: { 'Authorization': `Bearer ${user.access_token.substring(0, 10)}...` }, // Sanitize token
         });
       } else {
-        console.log('➡️ Request to /logout: No access token found for logout.');
+        logger.log('➡️ Request to /logout: No access token found for logout.');
       }
 
       const response = await fetch(`${API_URL}/logout`, {
@@ -334,7 +335,7 @@ export const authService = {
         credentials: 'include',
       });
 
-      console.log('📡 Response from /logout:', {
+      logger.log('📡 Response from /logout:', {
         status: response.status,
         statusText: response.statusText,
         headers: Object.fromEntries(response.headers.entries()),
@@ -345,21 +346,21 @@ export const authService = {
         try {
           const error = await response.json();
           errorDetails = JSON.stringify(error);
-          console.error('❌ Logout failed with error details:', error);
+          logger.error('❌ Logout failed with error details:', error);
         } catch (e) {
-          console.error('❌ Logout failed, could not parse error response:', e);
+          logger.error('❌ Logout failed, could not parse error response:', e);
         }
         throw new Error(`Erro no logout: ${errorDetails}`);
       }
-      console.log('✅ Logout successful!');
+      logger.log('✅ Logout successful!');
     } catch (error) {
-      console.error('❌ Erro no logout:', error);
+      logger.error('❌ Erro no logout:', error);
       throw error; // Re-throw to ensure finally block is still executed after this.
     } finally {
       localStorage.removeItem('user');
       // Explicitly remove the access_token cookie
       document.cookie = "access_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      console.log('🗑️ User removed from localStorage and access_token cookie cleared.');
+      logger.log('🗑️ User removed from localStorage and access_token cookie cleared.');
     }
   },
 
@@ -368,11 +369,11 @@ export const authService = {
     try {
       const currentUser = this.getUser();
       if (!currentUser || !currentUser.access_token) {
-        console.log('➡️ Request to /profile (PUT): No access token found in local storage.');
+        logger.log('➡️ Request to /profile (PUT): No access token found in local storage.');
         throw new Error('No access token found in local storage.');
       }
 
-      console.log('➡️ Request to /profile (PUT):', {
+      logger.log('➡️ Request to /profile (PUT):', {
         method: 'PUT',
         url: `${API_URL}/profile`,
         headers: {
@@ -392,7 +393,7 @@ export const authService = {
         body: JSON.stringify(profileData),
       });
 
-      console.log('📡 Response from /profile (PUT):', {
+      logger.log('📡 Response from /profile (PUT):', {
         status: response.status,
         statusText: response.statusText,
         headers: Object.fromEntries(response.headers.entries()),
@@ -403,9 +404,9 @@ export const authService = {
         try {
           const error = await response.json();
           errorDetails = JSON.stringify(error);
-          console.error('❌ Failed to update profile with error details:', error);
+          logger.error('❌ Failed to update profile with error details:', error);
         } catch (e) {
-          console.error('❌ Failed to update profile, could not parse error response:', e);
+          logger.error('❌ Failed to update profile, could not parse error response:', e);
         }
         if (response.status === 401) {
           throw new Error(`SESSION_EXPIRED: ${errorDetails}`);
@@ -415,10 +416,10 @@ export const authService = {
 
       const updatedUser = await response.json();
       localStorage.setItem('user', JSON.stringify(updatedUser));
-      console.log('✅ Profile updated successfully! Data received:', updatedUser);
+      logger.log('✅ Profile updated successfully! Data received:', updatedUser);
       return updatedUser;
     } catch (error) {
-      console.error('❌ Erro ao atualizar perfil:', error);
+      logger.error('❌ Erro ao atualizar perfil:', error);
       throw error;
     }
   },
@@ -442,10 +443,10 @@ export const authService = {
     const endpoint = `${API_URL}/me`;
     const currentUser = this.getUser();
 
-    console.log('-------------------- DELETE ACCOUNT INITIATED --------------------');
-    console.log(`💀 Attempting to delete account for user: ${currentUser?.username}`);
-    console.log(`➡️ Requesting DELETE ${endpoint}`);
-    console.log(`➡️ Request Headers: ${JSON.stringify({})}`); // No special headers needed, JWT via cookie
+    logger.log('-------------------- DELETE ACCOUNT INITIATED --------------------');
+    logger.log(`💀 Attempting to delete account for user: ${currentUser?.username}`);
+    logger.log(`➡️ Requesting DELETE ${endpoint}`);
+    logger.log(`➡️ Request Headers: ${JSON.stringify({})}`); // No special headers needed, JWT via cookie
 
     try {
       const response = await fetch(endpoint, {
@@ -453,30 +454,30 @@ export const authService = {
         credentials: 'include' // Important for sending cookies
       });
 
-      console.log(`📡 Response Status: ${response.status} ${response.statusText}`);
-      console.log(`📡 Response Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
+      logger.log(`📡 Response Status: ${response.status} ${response.statusText}`);
+      logger.log(`📡 Response Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
 
       if (response.status === 204) { // 204 No Content for success
-        console.log('✅ Conta excluída com sucesso (204 No Content).');
+        logger.log('✅ Conta excluída com sucesso (204 No Content).');
         // The backend should handle invalidating the token; frontend just clears local state
         return { success: true };
       } else if (response.status === 400) {
         const errorData = await response.json();
-        console.error('❌ Erro 400 ao excluir conta:', errorData.detail);
+        logger.error('❌ Erro 400 ao excluir conta:', errorData.detail);
         throw new Error(errorData.detail);
       } else if (response.status === 401) {
-        console.error('❌ Não autorizado: usuário não autenticado ou sessão expirada.');
+        logger.error('❌ Não autorizado: usuário não autenticado ou sessão expirada.');
         throw new Error('Sessão expirada ou não autorizado. Por favor, faça login novamente.');
       } else {
         const errorData = await response.json().catch(() => null);
-        console.error('❌ Erro desconhecido ao excluir conta:', response.status, response.statusText, errorData);
+        logger.error('❌ Erro desconhecido ao excluir conta:', response.status, response.statusText, errorData);
         throw new Error(errorData?.detail || `Ocorreu um erro (${response.status}) ao excluir sua conta.`);
       }
     } catch (error) {
-      console.error(`❌ Global error during account deletion:`, error);
+      logger.error(`❌ Global error during account deletion:`, error);
       throw error;
     } finally {
-        console.log('-------------------- DELETE ACCOUNT ENDED --------------------');
+        logger.log('-------------------- DELETE ACCOUNT ENDED --------------------');
     }
   }
 };

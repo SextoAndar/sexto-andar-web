@@ -16,4 +16,9 @@ export default defineConfig({
       },
     },
   },
+  define: {
+    // Expose __DEBUG__ to the client-side code
+    // It will be true if VITE_APP_DEBUG is 'true', otherwise false
+    __DEBUG__: JSON.stringify(process.env.VITE_APP_DEBUG === 'true'),
+  },
 })

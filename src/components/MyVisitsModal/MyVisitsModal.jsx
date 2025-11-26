@@ -4,6 +4,7 @@ import VisitCard from '../VisitCard/VisitCard';
 import { getVisitsForUser, getUpcomingVisits, cancelVisit } from '../../services/visitService';
 import EditVisitModal from '../EditVisitModal/EditVisitModal';
 import Pagination from '../common/Pagination/Pagination'; // Import Pagination component
+import logger from '../../utils/logger'; // Import logger utility
 import './MyVisitsModal.css';
 
 function MyVisitsModal({ isOpen, onClose }) {
@@ -30,7 +31,7 @@ function MyVisitsModal({ isOpen, onClose }) {
         setTotalPages(0);
       }
     } catch (error) {
-      console.error(error.message);
+      logger.error(error.message);
       setVisits([]);
       setTotalPages(0);
     } finally {

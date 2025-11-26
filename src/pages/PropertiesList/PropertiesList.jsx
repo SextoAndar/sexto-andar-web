@@ -3,6 +3,7 @@ import { fetchProperties } from '../../services/propertyService';
 import PropertyCard from '../../components/PropertyCard/PropertyCard';
 import PropertyDetailsModal from '../../components/PropertyDetailsModal/PropertyDetailsModal';
 import Pagination from '../../components/common/Pagination/Pagination';
+import logger from '../../utils/logger'; // Import logger utility
 import './PropertiesList.css';
 
 export default function PropertiesList({ user, searchTerm }) {
@@ -33,6 +34,7 @@ export default function PropertiesList({ user, searchTerm }) {
         }
       })
       .catch(err => {
+        logger.error(err.message);
         setError(err.message);
         setProperties([]); 
         setTotalPages(0);

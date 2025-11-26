@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import authService from '../../services/authService';
 import { getPortfolioStats, getFavoritesCount } from '../../services/propertyService';
 import EditProfileForm from '../EditProfileForm/EditProfileForm';
+import logger from '../../utils/logger'; // Import logger utility
 import './ProfileModal.css';
 
 const StatCard = ({ icon, label, value }) => (
@@ -43,7 +44,7 @@ function ProfileModal({ user, onClose }) {
             const data = await getPortfolioStats();
             setStats(data);
           } catch (error) {
-            console.error('Erro ao buscar estatísticas:', error);
+            logger.error('Erro ao buscar estatísticas:', error);
           }
         };
         fetchStats();
@@ -53,7 +54,7 @@ function ProfileModal({ user, onClose }) {
             const data = await getFavoritesCount();
             setFavoritesCount(data.count);
           } catch (error) {
-            console.error('Erro ao buscar contagem de favoritos:', error);
+            logger.error('Erro ao buscar contagem de favoritos:', error);
           }
         };
         fetchFavoritesCount();
@@ -81,7 +82,7 @@ function ProfileModal({ user, onClose }) {
         return;
       }
       alert(`Erro ao atualizar perfil: ${error.message}`);
-      console.error('Erro detalhado:', error);
+      logger.error('Erro detalhado:', error);
     }
   };
 
@@ -109,7 +110,7 @@ function ProfileModal({ user, onClose }) {
         errorMessage = error.message; // Use the specific error message from authService
       }
       alert(`Erro: ${errorMessage}`);
-      console.error('Erro detalhado ao excluir conta:', error);
+      logger.error('Erro detalhado ao excluir conta:', error);
     }
   };
 

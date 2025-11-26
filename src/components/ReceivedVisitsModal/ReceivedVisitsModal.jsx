@@ -3,6 +3,7 @@ import Modal from '../common/Modal/Modal';
 import VisitCard from '../VisitCard/VisitCard';
 import { getAllOwnerVisits, getVisitsForSpecificProperty, cancelVisit, completeVisit } from '../../services/visitService';
 import Pagination from '../common/Pagination/Pagination'; // Import Pagination component
+import logger from '../../utils/logger'; // Import logger utility
 import './ReceivedVisitsModal.css';
 
 function ReceivedVisitsModal({ isOpen, onClose, propertyId }) {
@@ -26,7 +27,7 @@ function ReceivedVisitsModal({ isOpen, onClose, propertyId }) {
         setTotalPages(0);
       }
     } catch (error) {
-      console.error(error.message);
+      logger.error(error.message);
       setVisits([]);
       setTotalPages(0);
     } finally {

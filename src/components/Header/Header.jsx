@@ -110,7 +110,7 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
                   <span className="nav-icon">✉️</span>
                   Propostas Recebidas
                 </a>
-                <a href="#" className="nav-link" onClick={handleReceivedVisitsModalOpen}>
+                <a href="#" className="nav-link" onClick={handleReceivedVisitsClick}>
                   <span className="nav-icon">🗓️</span>
                   Visitas Recebidas
                 </a>

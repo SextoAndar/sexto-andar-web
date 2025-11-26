@@ -21,6 +21,8 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
     acceptTerms: false
   });
 
+  const loginUsernameRef = useRef(null);
+  const loginPasswordRef = useRef(null);
   const signupPasswordRef = useRef(null);
 
   const handleLoginChange = (e) => {
@@ -42,7 +44,17 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (activeTab === 'login') {
-      onSubmit(loginData);
+      const finalLoginData = { ...loginData };
+      const usernameFromDOM = loginUsernameRef.current.value;
+      const passwordFromDOM = loginPasswordRef.current.value;
+
+      if (usernameFromDOM && finalLoginData.username !== usernameFromDOM) {
+        finalLoginData.username = usernameFromDOM;
+      }
+      if (passwordFromDOM && finalLoginData.password !== passwordFromDOM) {
+        finalLoginData.password = passwordFromDOM;
+      }
+      onSubmit(finalLoginData);
     } else {
       // Garante que a senha do preenchimento automático seja capturada
       const finalSignupData = { ...signupData };
@@ -94,6 +106,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             placeholder="Seu username"
             required
             autoComplete="username"
+            ref={loginUsernameRef}
           />
           <Input
             type="password"
@@ -104,6 +117,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             placeholder="Sua senha"
             required
             autoComplete="current-password"
+            ref={loginPasswordRef}
           />
           <Button type="submit" variant="primary" disabled={isLoading}>
             {isLoading ? 'Entrando...' : 'Entrar'}
@@ -129,6 +143,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             onChange={handleSignupChange}
             placeholder="Seu nome completo"
             required
+            autoComplete="name"
           />
           <Input
             type="email"
@@ -138,6 +153,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             onChange={handleSignupChange}
             placeholder="seu@email.com"
             required
+            autoComplete="email"
           />
           <Input
             type="tel"
@@ -147,6 +163,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             onChange={handleSignupChange}
             placeholder="(11) 99999-9999"
             required
+            autoComplete="tel"
           />
           <Select
             label="Tipo de Usuário"

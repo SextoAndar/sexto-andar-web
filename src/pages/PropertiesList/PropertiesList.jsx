@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { fetchProperties } from '../../services/propertyService';
 import PropertyCard from '../../components/PropertyCard/PropertyCard';
 import PropertyDetailsModal from '../../components/PropertyDetailsModal/PropertyDetailsModal';
+import Pagination from '../../components/common/Pagination/Pagination';
 import './PropertiesList.css';
 
 export default function PropertiesList({ user, searchTerm }) {
@@ -10,19 +11,26 @@ export default function PropertiesList({ user, searchTerm }) {
   const [error, setError] = useState(null);
   const [selectedPropertyId, setSelectedPropertyId] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     setLoading(true);
-    const params = {};
+    const params = { page: currentPage, size: 10 };
     if (searchTerm) {
       params.search_term = searchTerm;
     }
     
     fetchProperties(params)
-      .then(data => setProperties(data.properties))
+      .then(data => {
+        if (data) {
+          setProperties(data.items);
+          setTotalPages(data.total_pages);
+        }
+      })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
-  }, [searchTerm]);
+  }, [searchTerm, currentPage]);
 
   const handleOpenDetails = (propertyId) => {
     setSelectedPropertyId(propertyId);
@@ -32,6 +40,10 @@ export default function PropertiesList({ user, searchTerm }) {
   const handleCloseDetails = () => {
     setIsDetailsOpen(false);
     setSelectedPropertyId(null);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   if (loading) return <div className="properties-list-loading">Carregando imóveis...</div>;
@@ -51,11 +63,18 @@ export default function PropertiesList({ user, searchTerm }) {
           <PropertyCard key={property.id} property={property} onDetails={handleOpenDetails} />
         ))}
       </div>
-      <PropertyDetailsModal 
-        propertyId={selectedPropertyId} 
-        isOpen={isDetailsOpen} 
-        onClose={handleCloseDetails} 
-        user={user}
+      {isDetailsOpen && (
+        <PropertyDetailsModal 
+          propertyId={selectedPropertyId} 
+          isOpen={isDetailsOpen} 
+          onClose={handleCloseDetails} 
+          user={user}
+        />
+      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
       />
     </div>
   );

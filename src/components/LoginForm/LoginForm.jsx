@@ -70,6 +70,20 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
     return ''; // No error
   };
 
+  const validatePhoneNumber = (phoneNumber) => {
+    if (!phoneNumber.trim()) {
+      return ''; // Optional, so empty is valid
+    }
+    if (phoneNumber.length > 20) {
+      return 'Máximo de 20 caracteres (incluindo não-numéricos).';
+    }
+    const cleanedNumber = phoneNumber.replace(/\D/g, ''); // Remove non-digits
+    if (cleanedNumber.length < 10 || cleanedNumber.length > 15) {
+      return 'Número deve ter entre 10 e 15 dígitos.';
+    }
+    return ''; // No error
+  };
+
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
     setLoginData(prev => ({
@@ -98,6 +112,10 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
       const error = validateEmail(value);
       setSignupErrors(prev => ({ ...prev, email: error }));
     }
+    if (name === 'phone') {
+      const error = validatePhoneNumber(value);
+      setSignupErrors(prev => ({ ...prev, phone: error }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -110,6 +128,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
       const passwordError = validatePassword(signupData.password);
       const fullNameError = validateFullName(signupData.fullName);
       const emailError = validateEmail(signupData.email);
+      const phoneError = validatePhoneNumber(signupData.phone);
       const acceptTermsError = signupData.acceptTerms ? '' : 'Você deve aceitar os termos de uso.';
 
       // Combine all signup errors for pre-submission validation
@@ -118,12 +137,13 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
         password: passwordError,
         fullName: fullNameError,
         email: emailError,
+        phone: phoneError,
         acceptTerms: acceptTermsError,
       };
       setSignupErrors(newSignupErrors);
 
       // Check if any critical errors exist
-      if (usernameError || passwordError || fullNameError || emailError || acceptTermsError || !signupData.acceptTerms) {
+      if (usernameError || passwordError || fullNameError || emailError || phoneError || acceptTermsError || !signupData.acceptTerms) {
         return;
       }
 
@@ -132,7 +152,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
   };
 
   const isLoginButtonDisabled = isLoading || !!loginErrors.username;
-  const isSignupButtonDisabled = isLoading || !!signupErrors.username || !!signupErrors.password || !!signupErrors.fullName || !!signupErrors.email || !!signupErrors.acceptTerms || !signupData.acceptTerms;
+  const isSignupButtonDisabled = isLoading || !!signupErrors.username || !!signupErrors.password || !!signupErrors.fullName || !!signupErrors.email || !!signupErrors.phone || !!signupErrors.acceptTerms || !signupData.acceptTerms;
 
   const userTypeOptions = [
     { value: 'Inquilino', label: 'Inquilino' },
@@ -237,6 +257,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             required
             autoComplete="tel"
           />
+          {signupErrors.phone && <div className="error-message-text">{signupErrors.phone}</div>}
           <Select
             label="Tipo de Usuário"
             name="userType"

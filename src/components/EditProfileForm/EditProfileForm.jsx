@@ -39,6 +39,20 @@ function EditProfileForm({ user, onSave, onCancel }) {
     return ''; // No error
   };
 
+  const validatePhoneNumber = (phoneNumber) => {
+    if (!phoneNumber.trim()) {
+      return ''; // Optional, so empty is valid
+    }
+    if (phoneNumber.length > 20) {
+      return 'Máximo de 20 caracteres (incluindo não-numéricos).';
+    }
+    const cleanedNumber = phoneNumber.replace(/\D/g, ''); // Remove non-digits
+    if (cleanedNumber.length < 10 || cleanedNumber.length > 15) {
+      return 'Número deve ter entre 10 e 15 dígitos.';
+    }
+    return ''; // No error
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -57,6 +71,10 @@ function EditProfileForm({ user, onSave, onCancel }) {
       const error = validateEmail(value);
       setFormErrors(prev => ({ ...prev, email: error }));
     }
+    if (name === 'phoneNumber') {
+      const error = validatePhoneNumber(value);
+      setFormErrors(prev => ({ ...prev, phoneNumber: error }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -66,11 +84,13 @@ function EditProfileForm({ user, onSave, onCancel }) {
     // Pre-submission validation
     const fullNameError = validateFullName(formData.fullName);
     const emailError = validateEmail(formData.email);
-    if (fullNameError || emailError) {
+    const phoneNumberError = validatePhoneNumber(formData.phoneNumber);
+    if (fullNameError || emailError || phoneNumberError) {
       setFormErrors(prev => ({
         ...prev,
         fullName: fullNameError,
         email: emailError,
+        phoneNumber: phoneNumberError,
       }));
       return;
     }
@@ -123,7 +143,7 @@ function EditProfileForm({ user, onSave, onCancel }) {
   };
 
   const needsPassword = formData.email !== user.email || formData.newPassword;
-  const isSubmitDisabled = isLoading || !!formErrors.fullName || !!formErrors.email;
+  const isSubmitDisabled = isLoading || !!formErrors.fullName || !!formErrors.email || !!formErrors.phoneNumber;
 
   return (
     <form className="edit-profile-form" onSubmit={handleSubmit}>
@@ -150,6 +170,7 @@ function EditProfileForm({ user, onSave, onCancel }) {
         required
         autoComplete="tel"
       />
+      {formErrors.phoneNumber && <div className="error-message-text">{formErrors.phoneNumber}</div>}
 
       <Input
         type="email"

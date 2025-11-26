@@ -175,19 +175,23 @@ export const authService = {
         ? `${API_URL}/register/property-owner`
         : `${API_URL}/register/user`;
 
+      const bodyData = {
+        username: userData.username,
+        fullName: userData.fullName,
+        email: userData.email,
+        phoneNumber: userData.phone,
+        password: userData.password
+      };
+
+      console.log('➡️ Request to /register: Payload being sent (for debugging purposes):', bodyData);
+      
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({
-          username: userData.username,
-          fullName: userData.fullName,
-          email: userData.email,
-          phoneNumber: userData.phone,
-          password: userData.password
-        }),
+        body: JSON.stringify(bodyData),
       });
 
       if (!response.ok) {

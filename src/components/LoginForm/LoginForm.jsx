@@ -131,6 +131,9 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
       const error = validatePhoneNumber(value);
       setSignupErrors(prev => ({ ...prev, phone: error }));
     }
+    if (name === 'acceptTerms' && checked) {
+      setSignupErrors(prev => ({ ...prev, acceptTerms: '' }));
+    }
   };
 
   const handleSubmit = (e) => {

@@ -21,14 +21,25 @@ export default function PropertiesList({ user, searchTerm }) {
       params.search_term = searchTerm;
     }
     
+    console.log('Fetching properties with params:', params);
     fetchProperties(params)
       .then(data => {
-        if (data) {
+        console.log('Fetched data:', data);
+        if (data && Array.isArray(data.items)) { // Ensure data.items is an array
           setProperties(data.items);
           setTotalPages(data.total_pages);
+        } else {
+          console.warn('Fetched data.items is not an array or data is null/undefined:', data);
+          setProperties([]); // Ensure properties is always an array
+          setTotalPages(0);
         }
       })
-      .catch(err => setError(err.message))
+      .catch(err => {
+        console.error('Error fetching properties:', err);
+        setError(err.message);
+        setProperties([]); // Ensure properties is always an array on error
+        setTotalPages(0);
+      })
       .finally(() => setLoading(false));
   }, [searchTerm, currentPage]);
 

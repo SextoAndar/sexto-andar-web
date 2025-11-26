@@ -10,6 +10,10 @@ export default defineConfig({
         target: 'https://sexto-andar-dev-proxy-d6d.herokuapp.com',
         changeOrigin: true,
       },
+      '/api': {
+        target: 'https://sexto-andar-dev-proxy-d6d.herokuapp.com',
+        changeOrigin: true,
+      },
     },
   },
 })

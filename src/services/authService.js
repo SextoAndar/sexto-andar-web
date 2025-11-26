@@ -198,12 +198,14 @@ export const authService = {
       const textResponse = await response.text(); // Sempre obtém o texto bruto da resposta primeiro
       let jsonResponse = null;
 
+      console.log('📡 Resposta bruta do servidor (antes do parseamento):', textResponse); // Loga o antes
+
       try {
         jsonResponse = JSON.parse(textResponse);
-        console.log('📡 Resposta do servidor (JSON):', jsonResponse);
+        console.log('📡 Resposta do servidor (após parseamento JSON):', jsonResponse); // Loga o depois
       } catch (parseError) {
-        // Se o parseamento falhar, a resposta não é um JSON válido. Loga o texto bruto.
-        console.error('📡 Resposta do servidor (não-JSON/erro de parseamento):', textResponse);
+        // Se o parseamento falhar, a resposta não é um JSON válido.
+        console.error('📡 Resposta do servidor não é JSON válido (erro de parseamento):', parseError);
       }
       // --- Fim do Parseamento Centralizado e Logging ---
 

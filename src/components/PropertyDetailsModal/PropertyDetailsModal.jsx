@@ -15,6 +15,28 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
   const [isScheduleVisitModalOpen, setIsScheduleVisitModalOpen] = useState(false);
   const [publicVisitDates, setPublicVisitDates] = useState([]);
 
+  const mapPropertyType = (type) => {
+    switch (type) {
+      case 'APARTMENT':
+        return 'Apartamento';
+      case 'HOUSE':
+        return 'Casa';
+      default:
+        return type;
+    }
+  };
+
+  const mapSalesType = (type) => {
+    switch (type) {
+      case 'RENT':
+        return 'Aluguel';
+      case 'SALE':
+        return 'Venda';
+      default:
+        return type;
+    }
+  };
+
   useEffect(() => {
     if (!isOpen || !propertyId) return;
     
@@ -120,8 +142,8 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
                 <p><strong>Tamanho:</strong> {property.propertySize} m²</p>
                 <p><strong>Descrição:</strong> {property.description}</p>
                 <p><strong>Valor:</strong> R$ {property.propertyValue}</p>
-                <p><strong>Tipo:</strong> {property.propertyType}</p>
-                <p><strong>Venda/Aluguel:</strong> {property.salesType}</p>
+                <p><strong>Tipo:</strong> {mapPropertyType(property.propertyType)}</p>
+                <p><strong>Venda/Aluguel:</strong> {mapSalesType(property.salesType)}</p>
               </div>
               
               <div className="public-visits-section">

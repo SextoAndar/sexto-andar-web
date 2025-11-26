@@ -47,6 +47,16 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
     return ''; // No error
   };
 
+  const validateFullName = (fullName) => {
+    if (!fullName.trim()) {
+      return 'Nome completo é obrigatório.';
+    }
+    if (fullName.length > 100) {
+      return 'Máximo de 100 caracteres.';
+    }
+    return ''; // No error
+  };
+
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
     setLoginData(prev => ({
@@ -75,6 +85,10 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
       const error = validatePassword(value);
       setSignupErrors(prev => ({ ...prev, password: error }));
     }
+    if (name === 'fullName') {
+      const error = validateFullName(value);
+      setSignupErrors(prev => ({ ...prev, fullName: error }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -101,19 +115,21 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
     } else { // activeTab === 'signup'
       const usernameError = validateUsername(signupData.username);
       const passwordError = validatePassword(signupData.password);
+      const fullNameError = validateFullName(signupData.fullName);
       const acceptTermsError = signupData.acceptTerms ? '' : 'Você deve aceitar os termos de uso.';
 
       // Combine all signup errors for pre-submission validation
       const newSignupErrors = {
         username: usernameError,
         password: passwordError,
+        fullName: fullNameError,
         acceptTerms: acceptTermsError,
         // Add other field validations here as needed
       };
       setSignupErrors(newSignupErrors);
 
       // Check if any critical errors exist
-      if (usernameError || passwordError || acceptTermsError || !signupData.acceptTerms) {
+      if (usernameError || passwordError || fullNameError || acceptTermsError || !signupData.acceptTerms) {
         return;
       }
 
@@ -128,7 +144,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
   };
 
   const isLoginButtonDisabled = isLoading || !!loginErrors.username;
-  const isSignupButtonDisabled = isLoading || !!signupErrors.username || !!signupErrors.password || !!signupErrors.acceptTerms || !signupData.acceptTerms;
+  const isSignupButtonDisabled = isLoading || !!signupErrors.username || !!signupErrors.password || !!signupErrors.fullName || !!signupErrors.acceptTerms || !signupData.acceptTerms;
 
   const userTypeOptions = [
     { value: 'Inquilino', label: 'Inquilino' },
@@ -211,6 +227,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             required
             autoComplete="name"
           />
+          {signupErrors.fullName && <div className="error-message-text">{signupErrors.fullName}</div>}
           <Input
             type="email"
             label="Email"

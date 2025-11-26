@@ -13,7 +13,18 @@ function EditProfileForm({ user, onSave, onCancel }) {
     confirmPassword: ''
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(''); // General form error (e.g., from API)
+  const [formErrors, setFormErrors] = useState({}); // Field-specific validation errors
+
+  const validateFullName = (fullName) => {
+    if (!fullName.trim()) {
+      return 'Nome completo é obrigatório.';
+    }
+    if (fullName.length > 100) {
+      return 'Máximo de 100 caracteres.';
+    }
+    return ''; // No error
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,13 +33,26 @@ function EditProfileForm({ user, onSave, onCancel }) {
       [name]: value
     }));
     setError('');
+    // Clear field-specific error when user types
+    setFormErrors(prev => ({ ...prev, [name]: '' })); 
+
+    if (name === 'fullName') {
+      const error = validateFullName(value);
+      setFormErrors(prev => ({ ...prev, fullName: error }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Validações
+    // Pre-submission validation
+    const fullNameError = validateFullName(formData.fullName);
+    if (fullNameError) {
+      setFormErrors(prev => ({ ...prev, fullName: fullNameError }));
+      return;
+    }
+    // ... other validations ...
     if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
       setError('As senhas não coincidem');
       return;
@@ -77,6 +101,7 @@ function EditProfileForm({ user, onSave, onCancel }) {
   };
 
   const needsPassword = formData.email !== user.email || formData.newPassword;
+  const isSubmitDisabled = isLoading || !!formErrors.fullName;
 
   return (
     <form className="edit-profile-form" onSubmit={handleSubmit}>
@@ -92,6 +117,7 @@ function EditProfileForm({ user, onSave, onCancel }) {
         onChange={handleChange}
         required
       />
+      {formErrors.fullName && <div className="error-message-text">{formErrors.fullName}</div>}
 
       <Input
         type="tel"

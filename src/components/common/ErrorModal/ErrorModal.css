@@ -1,0 +1,27 @@
+/* src/components/common/ErrorModal/ErrorModal.css */
+
+.error-modal-container {
+  padding: 1rem;
+}
+
+.error-message-box {
+  background-color: #f3f4f6; /* Cor de fundo cinza claro */
+  border: 1px solid #d1d5db; /* Borda cinza */
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  white-space: pre-wrap;       /* Quebra a linha se o texto for muito longo */
+  word-wrap: break-word;       /* Garante que palavras longas não estourem a caixa */
+  max-height: 200px;           /* Altura máxima com scroll */
+  overflow-y: auto;            /* Adiciona scroll vertical se necessário */
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.error-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem; /* Espaço entre os botões */
+  margin-top: 1rem;
+}

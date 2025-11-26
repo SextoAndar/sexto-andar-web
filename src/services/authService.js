@@ -1,3 +1,4 @@
+import errorService from './errorService';
 // Serviço de autenticação integrado com sexto-andar-auth
 // Usa proxy do Vite para evitar problemas com cookies cross-origin
 const API_URL = '/auth/v1/auth';
@@ -190,8 +191,26 @@ export const authService = {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || 'Falha no cadastro');
+        const errorBody = await response.clone().json().catch(() => null);
+        let publicErrorMessage = errorBody?.detail || `Erro ${response.status}: ${response.statusText}`;
+        let fullErrorText = `Endpoint: ${endpoint}\nMensagem: ${publicErrorMessage}\n\n--- Resposta do Servidor ---\n`;
+
+        if (errorBody) {
+          console.error('❌ Erro no cadastro! Resposta de erro do servidor (JSON):', errorBody);
+          fullErrorText += JSON.stringify(errorBody, null, 2);
+        } else {
+          const textResponse = await response.text();
+          console.error('❌ Erro no cadastro! Resposta de erro do servidor (não-JSON):', textResponse);
+          fullErrorText += textResponse;
+          // Se a resposta for HTML (como um erro de proxy), o usuário não precisa ver o HTML inteiro.
+          // A mensagem pública permanece mais limpa.
+          if (textResponse.trim().startsWith('<!DOCTYPE html>') || textResponse.trim().startsWith('<html>')) {
+            publicErrorMessage = `Erro ${response.status}: A resposta do servidor não foi um JSON válido, possivelmente um erro de proxy ou de rede.`;
+          }
+        }
+        
+        errorService.showError({ message: fullErrorText, title: "Erro de Cadastro" });
+        throw new Error(publicErrorMessage);
       }
 
       const data = await response.json();

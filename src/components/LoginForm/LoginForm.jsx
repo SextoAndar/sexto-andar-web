@@ -84,6 +84,13 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
     return ''; // No error
   };
 
+  const validateLoginIdentifier = (identifier) => {
+    if (!identifier.trim()) {
+      return 'O campo de usuário é obrigatório.';
+    }
+    return ''; // No error
+  };
+
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
     setLoginData(prev => ({
@@ -92,7 +99,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
     }));
 
     if (name === 'username') {
-      const error = validateUsername(value);
+      const error = validateLoginIdentifier(value);
       setLoginErrors(prev => ({ ...prev, username: error }));
     }
   };
@@ -104,6 +111,14 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
       [name]: type === 'checkbox' ? checked : value
     }));
 
+    if (name === 'username') {
+      const error = validateUsername(value);
+      setSignupErrors(prev => ({ ...prev, username: error }));
+    }
+    if (name === 'password') {
+      const error = validatePassword(value);
+      setSignupErrors(prev => ({ ...prev, password: error }));
+    }
     if (name === 'fullName') {
       const error = validateFullName(value);
       setSignupErrors(prev => ({ ...prev, fullName: error }));
@@ -122,7 +137,23 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
     e.preventDefault();
 
     if (activeTab === 'login') {
-      // ... (login logic)
+      const identifierError = validateLoginIdentifier(loginData.username);
+      if (identifierError) {
+        setLoginErrors(prev => ({ ...prev, username: identifierError }));
+        return;
+      }
+      
+      const finalLoginData = { ...loginData };
+      const usernameFromDOM = loginUsernameRef.current.value;
+      const passwordFromDOM = loginPasswordRef.current.value;
+
+      if (usernameFromDOM && finalLoginData.username !== usernameFromDOM) {
+        finalLoginData.username = usernameFromDOM;
+      }
+      if (passwordFromDOM && finalLoginData.password !== passwordFromDOM) {
+        finalLoginData.password = passwordFromDOM;
+      }
+      onSubmit(finalLoginData);
     } else { // activeTab === 'signup'
       const usernameError = validateUsername(signupData.username);
       const passwordError = validatePassword(signupData.password);
@@ -147,7 +178,13 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
         return;
       }
 
-      // ... (submit logic)
+      // Garante que a senha do preenchimento automático seja capturada
+      const finalSignupData = { ...signupData };
+      const passwordFromDOM = signupPasswordRef.current.value;
+      if (passwordFromDOM && finalSignupData.password !== passwordFromDOM) {
+        finalSignupData.password = passwordFromDOM;
+      }
+      onSubmit(finalSignupData);
     }
   };
 
@@ -187,11 +224,11 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
         <form className="login-form" onSubmit={handleSubmit}>
           <Input
             type="text"
-            label="Username"
+            label="Username ou Email"
             name="username"
             value={loginData.username}
             onChange={handleLoginChange}
-            placeholder="Seu username"
+            placeholder="Seu username ou email"
             required
             autoComplete="username"
             ref={loginUsernameRef}

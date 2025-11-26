@@ -2,21 +2,33 @@ import React, { useState, useEffect } from 'react';
 import Modal from '../common/Modal/Modal';
 import VisitCard from '../VisitCard/VisitCard';
 import { getAllOwnerVisits, getVisitsForSpecificProperty, cancelVisit, completeVisit } from '../../services/visitService';
+import Pagination from '../common/Pagination/Pagination'; // Import Pagination component
 import './ReceivedVisitsModal.css';
 
 function ReceivedVisitsModal({ isOpen, onClose, propertyId }) {
   const [visits, setVisits] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1); // Add currentPage state
+  const [totalPages, setTotalPages] = useState(0); // Add totalPages state
 
-  const loadVisits = async () => {
+  const loadVisits = async (page = 1) => {
     setLoading(true);
     try {
       const data = propertyId
-        ? await getVisitsForSpecificProperty(propertyId)
-        : await getAllOwnerVisits();
-      setVisits(data.visits);
+        ? await getVisitsForSpecificProperty(propertyId, { page, size: 10 })
+        : await getAllOwnerVisits({ page, size: 10 });
+      
+      if (data && Array.isArray(data.visits)) {
+        setVisits(data.visits);
+        setTotalPages(data.total_pages);
+      } else {
+        setVisits([]);
+        setTotalPages(0);
+      }
     } catch (error) {
       console.error(error.message);
+      setVisits([]);
+      setTotalPages(0);
     } finally {
       setLoading(false);
     }
@@ -24,16 +36,16 @@ function ReceivedVisitsModal({ isOpen, onClose, propertyId }) {
 
   useEffect(() => {
     if (isOpen) {
-      loadVisits();
+      loadVisits(currentPage);
     }
-  }, [isOpen, propertyId]);
+  }, [isOpen, propertyId, currentPage]); // Added currentPage to dependencies
 
   const handleCancel = async (visitId) => {
     if (window.confirm('Tem certeza que deseja cancelar esta visita?')) {
       try {
         await cancelVisit(visitId);
         alert('Visita cancelada com sucesso!');
-        loadVisits(); // Refresh the list
+        loadVisits(currentPage); // Refresh the list
       } catch (error) {
         alert(`Erro ao cancelar visita: ${error.message}`);
       }
@@ -45,11 +57,15 @@ function ReceivedVisitsModal({ isOpen, onClose, propertyId }) {
       try {
         await completeVisit(visitId);
         alert('Visita marcada como concluída com sucesso!');
-        loadVisits(); // Refresh the list
+        loadVisits(currentPage); // Refresh the list
       } catch (error) {
         alert(`Erro ao marcar visita como concluída: ${error.message}`);
       }
     }
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   const modalTitle = propertyId ? "Visitas para este Imóvel" : "Visitas Recebidas";
@@ -73,6 +89,13 @@ function ReceivedVisitsModal({ isOpen, onClose, propertyId }) {
           <p>Nenhuma visita encontrada.</p>
         )}
       </div>
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      )}
     </Modal>
   );
 }

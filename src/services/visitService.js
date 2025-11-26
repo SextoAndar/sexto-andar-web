@@ -77,8 +77,11 @@ export async function cancelVisit(visitId) {
   return await res.json();
 }
 
-export async function getUpcomingVisits() {
-  const res = await fetch('/api/api/visits/upcoming', {
+export async function getUpcomingVisits({ page = 1, size = 10 } = {}) {
+  const url = new URL('/api/api/visits/upcoming', window.location.origin);
+  url.searchParams.set('page', page);
+  url.searchParams.set('size', size);
+  const res = await fetch(url.toString(), {
     method: 'GET',
     credentials: 'include',
   });

@@ -4,6 +4,7 @@ import { scheduleVisit, getPublicPropertyVisits } from '../../services/visitServ
 import Button from '../common/Button/Button';
 import ProposalFormModal from '../ProposalFormModal/ProposalFormModal';
 import ScheduleVisitModal from '../ScheduleVisitModal/ScheduleVisitModal';
+import Pagination from '../common/Pagination/Pagination'; // Import Pagination component
 import './PropertyDetailsModal.css';
 
 const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
@@ -14,6 +15,8 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
   const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
   const [isScheduleVisitModalOpen, setIsScheduleVisitModalOpen] = useState(false);
   const [publicVisitDates, setPublicVisitDates] = useState([]);
+  const [publicVisitCurrentPage, setPublicVisitCurrentPage] = useState(1); // Add state for public visit pagination
+  const [publicVisitTotalPages, setPublicVisitTotalPages] = useState(0); // Add state for public visit total pages
 
   const mapPropertyType = (type) => {
     switch (type) {
@@ -53,17 +56,25 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
           setIsFavorited(favoriteStatus.is_favorited);
         }
         
-        const publicVisits = await getPublicPropertyVisits(propertyId);
-        setPublicVisitDates(publicVisits.visits);
+        const publicVisitsData = await getPublicPropertyVisits(propertyId, { page: publicVisitCurrentPage, size: 5 }); // Fetch with pagination
+        if (publicVisitsData && Array.isArray(publicVisitsData.visits)) {
+          setPublicVisitDates(publicVisitsData.visits);
+          setPublicVisitTotalPages(publicVisitsData.total_pages);
+        } else {
+          setPublicVisitDates([]);
+          setPublicVisitTotalPages(0);
+        }
       } catch (err) {
         setError(err.message);
+        setPublicVisitDates([]);
+        setPublicVisitTotalPages(0);
       } finally {
         setLoading(false);
       }
     };
     
     getDetails();
-  }, [propertyId, isOpen, user]);
+  }, [propertyId, isOpen, user, publicVisitCurrentPage]); // Added publicVisitCurrentPage to dependencies
 
   const handleFavorite = async () => {
     try {
@@ -89,11 +100,16 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
       alert('Visita agendada com sucesso!');
       setIsScheduleVisitModalOpen(false);
       // Refresh public visit dates after scheduling
-      const publicVisits = await getPublicPropertyVisits(propertyId);
+      const publicVisits = await getPublicPropertyVisits(propertyId, { page: publicVisitCurrentPage, size: 5 }); // Fetch with pagination
       setPublicVisitDates(publicVisits.visits);
+      setPublicVisitTotalPages(publicVisits.total_pages);
     } catch (err) {
       alert(`Erro ao agendar visita: ${err.message}`);
     }
+  };
+
+  const handlePublicVisitPageChange = (page) => {
+    setPublicVisitCurrentPage(page);
   };
 
   const formatVisitDate = (dateString) => {
@@ -158,6 +174,13 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
                   </ul>
                 ) : (
                   <p>Nenhuma visita pública agendada.</p>
+                )}
+                {publicVisitTotalPages > 1 && (
+                  <Pagination
+                    currentPage={publicVisitCurrentPage}
+                    totalPages={publicVisitTotalPages}
+                    onPageChange={handlePublicVisitPageChange}
+                  />
                 )}
               </div>
 

@@ -3,6 +3,7 @@ import Modal from '../common/Modal/Modal';
 import ProposalCard from '../ProposalCard/ProposalCard';
 import { getReceivedProposals, getProposalsForProperty, acceptProposal, rejectProposal } from '../../services/proposalService';
 import ProposalDetailsModal from '../ProposalDetailsModal/ProposalDetailsModal';
+import Pagination from '../common/Pagination/Pagination'; // Import Pagination component
 import './ProposalsModal.css';
 
 function ProposalsModal({ isOpen, onClose, user, propertyId }) {
@@ -10,28 +11,48 @@ function ProposalsModal({ isOpen, onClose, user, propertyId }) {
   const [loading, setLoading] = useState(false);
   const [selectedProposalId, setSelectedProposalId] = useState(null);
   const [isProposalDetailsOpen, setIsProposalDetailsOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1); // Add currentPage state
+  const [totalPages, setTotalPages] = useState(0); // Add totalPages state
 
   useEffect(() => {
     if (isOpen) {
       setLoading(true);
       const fetchProposals = propertyId 
-        ? getProposalsForProperty(propertyId)
-        : getReceivedProposals();
+        ? getProposalsForProperty(propertyId, { page: currentPage, size: 10 })
+        : getReceivedProposals({ page: currentPage, size: 10 });
 
       fetchProposals
-        .then(data => setProposals(data.proposals))
-        .catch(err => console.error(err.message))
+        .then(data => {
+          if (data && Array.isArray(data.proposals)) {
+            setProposals(data.proposals);
+            setTotalPages(data.total_pages);
+          } else {
+            setProposals([]);
+            setTotalPages(0);
+          }
+        })
+        .catch(err => {
+          console.error(err.message);
+          setProposals([]);
+          setTotalPages(0);
+        })
         .finally(() => setLoading(false));
     }
-  }, [isOpen, propertyId]);
+  }, [isOpen, propertyId, currentPage]); // Added currentPage to dependencies
 
   const handleAccept = async (proposalId) => {
     try {
       await acceptProposal(proposalId);
       const data = propertyId 
-        ? await getProposalsForProperty(propertyId)
-        : await getReceivedProposals();
-      setProposals(data.proposals);
+        ? await getProposalsForProperty(propertyId, { page: currentPage, size: 10 })
+        : await getReceivedProposals({ page: currentPage, size: 10 });
+      if (data && Array.isArray(data.proposals)) {
+        setProposals(data.proposals);
+        setTotalPages(data.total_pages);
+      } else {
+        setProposals([]);
+        setTotalPages(0);
+      }
     } catch (error) {
       alert(`Erro ao aceitar proposta: ${error.message}`);
     }
@@ -41,9 +62,15 @@ function ProposalsModal({ isOpen, onClose, user, propertyId }) {
     try {
       await rejectProposal(proposalId);
       const data = propertyId 
-        ? await getProposalsForProperty(propertyId)
-        : await getReceivedProposals();
-      setProposals(data.proposals);
+        ? await getProposalsForProperty(propertyId, { page: currentPage, size: 10 })
+        : await getReceivedProposals({ page: currentPage, size: 10 });
+      if (data && Array.isArray(data.proposals)) {
+        setProposals(data.proposals);
+        setTotalPages(data.total_pages);
+      } else {
+        setProposals([]);
+        setTotalPages(0);
+      }
     } catch (error) {
       alert(`Erro ao rejeitar proposta: ${error.message}`);
     }
@@ -57,6 +84,10 @@ function ProposalsModal({ isOpen, onClose, user, propertyId }) {
   const handleCloseProposalDetails = () => {
     setIsProposalDetailsOpen(false);
     setSelectedProposalId(null);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   const modalTitle = propertyId ? "Propostas para este Imóvel" : "Propostas Recebidas";
@@ -82,6 +113,13 @@ function ProposalsModal({ isOpen, onClose, user, propertyId }) {
             <p>Nenhuma proposta encontrada.</p>
           )}
         </div>
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
       </Modal>
       <ProposalDetailsModal
         proposalId={selectedProposalId}

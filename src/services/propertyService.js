@@ -9,8 +9,10 @@ export async function fetchProperties({ page = 1, size = 12, ...params } = {}) {
   return await res.json();
 }
 
-export async function fetchOwnerProperties({ active_only = true } = {}) {
+export async function fetchOwnerProperties({ page = 1, size = 10, active_only = true } = {}) {
   const url = new URL('/api/api/properties/owner/my-properties', window.location.origin);
+  url.searchParams.set('page', page);
+  url.searchParams.set('size', size);
   url.searchParams.set('active_only', active_only);
   
   const res = await fetch(url.toString(), {

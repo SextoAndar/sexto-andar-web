@@ -6,6 +6,7 @@ import PropertyEditModal from '../PropertyEditModal/PropertyEditModal';
 import TrashModal from '../TrashModal/TrashModal';
 import ProposalsModal from '../ProposalsModal/ProposalsModal';
 import ReceivedVisitsModal from '../ReceivedVisitsModal/ReceivedVisitsModal';
+import Pagination from '../common/Pagination/Pagination'; // Import Pagination component
 import { fetchOwnerProperties, deleteProperty } from '../../services/propertyService';
 import './OwnerPropertiesModal.css';
 
@@ -18,21 +19,31 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [selectedPropertyForProposals, setSelectedPropertyForProposals] = useState(null);
   const [selectedPropertyForVisits, setSelectedPropertyForVisits] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // Add currentPage state
+  const [totalPages, setTotalPages] = useState(0); // Add totalPages state
 
-  const loadActiveProperties = async () => {
+  const loadActiveProperties = async (page = 1) => {
     try {
-      const data = await fetchOwnerProperties({ active_only: true });
-      setProperties(data.properties);
+      const data = await fetchOwnerProperties({ page, size: 10, active_only: true });
+      if (data && Array.isArray(data.properties)) {
+        setProperties(data.properties);
+        setTotalPages(data.total_pages);
+      } else {
+        setProperties([]);
+        setTotalPages(0);
+      }
     } catch (error) {
       console.error(error.message);
+      setProperties([]);
+      setTotalPages(0);
     }
   };
 
   useEffect(() => {
     if (isOpen) {
-      loadActiveProperties();
+      loadActiveProperties(currentPage);
     }
-  }, [isOpen]);
+  }, [isOpen, currentPage]);
 
   const handleEditProperty = (propertyId) => {
     const propertyToEdit = properties.find(p => p.id === propertyId);
@@ -44,7 +55,7 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
     if (window.confirm('Tem certeza que deseja desativar este imóvel?')) {
       try {
         await deleteProperty(propertyId);
-        loadActiveProperties();
+        loadActiveProperties(currentPage); // Refresh current page
       } catch (error) {
         console.error(error.message);
         alert(`Erro ao desativar imóvel: ${error.message}`);
@@ -67,19 +78,23 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
     setSelectedProperty(null);
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   const handleCloseAndRefresh = async () => {
-    loadActiveProperties();
+    loadActiveProperties(currentPage);
     handleCloseEditModal();
   };
   
   const handleTrashModalClose = () => {
     setIsTrashModalOpen(false);
-    loadActiveProperties();
+    loadActiveProperties(currentPage);
   }
 
   const handleImageUpdate = async () => {
     console.log('handleImageUpdate: Refreshing properties...');
-    const updatedPropertiesData = await fetchOwnerProperties();
+    const updatedPropertiesData = await fetchOwnerProperties({ page: currentPage, size: 10 }); // Fetch with pagination
     console.log('handleImageUpdate: Received properties data:', updatedPropertiesData);
     
     const updatedProperties = updatedPropertiesData.properties;
@@ -124,9 +139,14 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
             <p>Você ainda não cadastrou nenhuma propriedade ativa.</p>
           )}
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </Modal>
       
-      {selectedProperty && (
+      {isEditModalOpen && selectedProperty && (
         <PropertyEditModal
           isOpen={isEditModalOpen}
           onClose={handleCloseEditModal}

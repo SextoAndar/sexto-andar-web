@@ -16,12 +16,14 @@
   color: #337ab7;
   cursor: pointer;
   background-color: #fff;
+  border-radius: 4px; /* Added for consistency */
+  transition: all 0.3s; /* Added for consistency */
 }
 
 .page-item.active .page-link {
-  background-color: #337ab7;
+  background-color: #00a868; /* Changed to primary green */
   color: #fff;
-  border-color: #337ab7;
+  border-color: #00a868; /* Changed to primary green */
 }
 
 .page-item.disabled .page-link {

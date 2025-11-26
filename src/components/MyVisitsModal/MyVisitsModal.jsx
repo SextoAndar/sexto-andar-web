@@ -3,6 +3,7 @@ import Modal from '../common/Modal/Modal';
 import VisitCard from '../VisitCard/VisitCard';
 import { getVisitsForUser, getUpcomingVisits, cancelVisit } from '../../services/visitService';
 import EditVisitModal from '../EditVisitModal/EditVisitModal';
+import Pagination from '../common/Pagination/Pagination'; // Import Pagination component
 import './MyVisitsModal.css';
 
 function MyVisitsModal({ isOpen, onClose }) {
@@ -11,14 +12,27 @@ function MyVisitsModal({ isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState('all'); // 'all' or 'upcoming'
   const [isEditVisitModalOpen, setIsEditVisitModalOpen] = useState(false);
   const [selectedVisit, setSelectedVisit] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // Add currentPage state
+  const [totalPages, setTotalPages] = useState(0); // Add totalPages state
 
-  const loadVisits = async () => {
+  const loadVisits = async (page = 1) => {
     setLoading(true);
     try {
-      const data = activeTab === 'upcoming' ? await getUpcomingVisits() : await getVisitsForUser();
-      setVisits(data.visits);
+      const data = activeTab === 'upcoming' 
+        ? await getUpcomingVisits({ page, size: 10 }) 
+        : await getVisitsForUser({ page, size: 10 });
+      
+      if (data && Array.isArray(data.visits)) {
+        setVisits(data.visits);
+        setTotalPages(data.total_pages);
+      } else {
+        setVisits([]);
+        setTotalPages(0);
+      }
     } catch (error) {
       console.error(error.message);
+      setVisits([]);
+      setTotalPages(0);
     } finally {
       setLoading(false);
     }
@@ -26,16 +40,21 @@ function MyVisitsModal({ isOpen, onClose }) {
 
   useEffect(() => {
     if (isOpen) {
-      loadVisits();
+      // Reset currentPage to 1 when activeTab changes, but only if it's not already 1
+      if (currentPage !== 1) {
+        setCurrentPage(1);
+      } else {
+        loadVisits(currentPage);
+      }
     }
-  }, [isOpen, activeTab]);
+  }, [isOpen, activeTab, currentPage]); // Added currentPage to dependencies
 
   const handleCancel = async (visitId) => {
     if (window.confirm('Tem certeza que deseja cancelar esta visita?')) {
       try {
         await cancelVisit(visitId);
         alert('Visita cancelada com sucesso!');
-        loadVisits(); // Refresh the list
+        loadVisits(currentPage); // Refresh the list
       } catch (error) {
         alert(`Erro ao cancelar visita: ${error.message}`);
       }
@@ -48,9 +67,13 @@ function MyVisitsModal({ isOpen, onClose }) {
   };
 
   const handleVisitUpdated = () => {
-    loadVisits(); // Reload visits after update
+    loadVisits(currentPage); // Reload visits after update
     setIsEditVisitModalOpen(false);
     setSelectedVisit(null);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -87,6 +110,11 @@ function MyVisitsModal({ isOpen, onClose }) {
             <p>Você não tem nenhuma visita agendada.</p>
           )}
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </Modal>
       {selectedVisit && (
         <EditVisitModal

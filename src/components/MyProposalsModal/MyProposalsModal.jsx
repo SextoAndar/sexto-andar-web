@@ -5,6 +5,7 @@ import Modal from '../common/Modal/Modal';
 import ProposalCard from '../ProposalCard/ProposalCard';
 import { getMyProposals, withdrawProposal, deleteProposal } from '../../services/proposalService';
 import ProposalDetailsModal from '../ProposalDetailsModal/ProposalDetailsModal';
+import Pagination from '../common/Pagination/Pagination'; // Import Pagination component
 import './MyProposalsModal.css';
 
 function MyProposalsModal({ isOpen, onClose, user }) {
@@ -12,14 +13,24 @@ function MyProposalsModal({ isOpen, onClose, user }) {
   const [loading, setLoading] = useState(false);
   const [selectedProposalId, setSelectedProposalId] = useState(null);
   const [isProposalDetailsOpen, setIsProposalDetailsOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1); // Add currentPage state
+  const [totalPages, setTotalPages] = useState(0); // Add totalPages state
 
-  const loadProposals = async () => {
+  const loadProposals = async (page = 1) => {
     setLoading(true);
     try {
-      const data = await getMyProposals();
-      setProposals(data.proposals);
+      const data = await getMyProposals({ page, size: 10 });
+      if (data && Array.isArray(data.proposals)) {
+        setProposals(data.proposals);
+        setTotalPages(data.total_pages);
+      } else {
+        setProposals([]);
+        setTotalPages(0);
+      }
     } catch (error) {
       console.error(error.message);
+      setProposals([]);
+      setTotalPages(0);
     } finally {
       setLoading(false);
     }
@@ -27,16 +38,16 @@ function MyProposalsModal({ isOpen, onClose, user }) {
 
   useEffect(() => {
     if (isOpen) {
-      loadProposals();
+      loadProposals(currentPage);
     }
-  }, [isOpen]);
+  }, [isOpen, currentPage]);
 
   const handleWithdraw = async (proposalId) => {
     if (window.confirm('Tem certeza que deseja retirar esta proposta?')) {
       try {
         await withdrawProposal(proposalId);
         alert('Proposta retirada com sucesso!');
-        loadProposals(); // Refresh the list
+        loadProposals(currentPage); // Refresh the list
       } catch (error) {
         alert(`Erro ao retirar proposta: ${error.message}`);
       }
@@ -48,7 +59,7 @@ function MyProposalsModal({ isOpen, onClose, user }) {
       try {
         await deleteProposal(proposalId);
         alert('Proposta excluída com sucesso!');
-        loadProposals(); // Refresh the list
+        loadProposals(currentPage); // Refresh the list
       } catch (error) {
         alert(`Erro ao excluir proposta: ${error.message}`);
       }
@@ -63,6 +74,10 @@ function MyProposalsModal({ isOpen, onClose, user }) {
   const handleCloseProposalDetails = () => { 
     setIsProposalDetailsOpen(false);
     setSelectedProposalId(null);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -86,6 +101,11 @@ function MyProposalsModal({ isOpen, onClose, user }) {
             <p>Você ainda não enviou nenhuma proposta.</p>
           )}
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </Modal>
       <ProposalDetailsModal
         proposalId={selectedProposalId}

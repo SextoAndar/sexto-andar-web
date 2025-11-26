@@ -205,6 +205,7 @@ export const authService = {
         } else {
           const textResponse = await response.text();
           console.error('❌ Erro no cadastro! Resposta de erro do servidor (não-JSON):', textResponse);
+          console.error('❌ Erro no cadastro! Resposta de erro do servidor (não-JSON):', textResponse);
           fullErrorText += textResponse;
           // Se a resposta for HTML (como um erro de proxy), o usuário não precisa ver o HTML inteiro.
           // A mensagem pública permanece mais limpa.

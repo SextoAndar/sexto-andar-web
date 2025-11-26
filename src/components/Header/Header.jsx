@@ -88,6 +88,18 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
           </div>
 
           <nav className="header-nav">
+            {(!user || (user.role !== 'PROPERTY_OWNER' && user.role !== 'ADMIN')) && (
+              <a href="#" className="nav-link" onClick={!user ? onLoginClick : undefined}>
+                <span className="nav-icon">🏠</span>
+                Alugar
+              </a>
+            )}
+            {(!user || (user.role !== 'USER' && user.role !== 'ADMIN')) && (
+              <a href="#" className="nav-link" onClick={handleAnnounceClick}>
+                <span className="nav-icon">➕</span>
+                Anunciar
+              </a>
+            )}
             {user && user.role === 'PROPERTY_OWNER' && (
               <>
                 <a href="#" className="nav-link" onClick={handleMyPropertiesClick}>

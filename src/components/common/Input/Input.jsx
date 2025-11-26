@@ -1,6 +1,7 @@
+import { forwardRef } from 'react';
 import './Input.css';
 
-function Input({ type = 'text', label, name, value, onChange, placeholder, required = false, autoComplete }) {
+const Input = forwardRef(({ type = 'text', label, name, value, onChange, placeholder, required = false, autoComplete }, ref) => {
   return (
     <div className="input-container">
       {label && <label htmlFor={name} className="input-label">{label}</label>}
@@ -14,9 +15,12 @@ function Input({ type = 'text', label, name, value, onChange, placeholder, requi
         required={required}
         className="input-field"
         autoComplete={autoComplete}
+        ref={ref}
       />
     </div>
   );
-}
+});
+
+Input.displayName = 'Input';
 
 export default Input;

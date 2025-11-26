@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Input from '../common/Input/Input';
 import Button from '../common/Button/Button';
 import Select from '../common/Select/Select';
@@ -21,6 +21,8 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
     acceptTerms: false
   });
 
+  const signupPasswordRef = useRef(null);
+
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
     setLoginData(prev => ({
@@ -42,7 +44,13 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
     if (activeTab === 'login') {
       onSubmit(loginData);
     } else {
-      onSubmit(signupData);
+      // Garante que a senha do preenchimento automático seja capturada
+      const finalSignupData = { ...signupData };
+      const passwordFromDOM = signupPasswordRef.current.value;
+      if (passwordFromDOM && finalSignupData.password !== passwordFromDOM) {
+        finalSignupData.password = passwordFromDOM;
+      }
+      onSubmit(finalSignupData);
     }
   };
 
@@ -157,6 +165,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             placeholder="Crie uma senha segura"
             required
             autoComplete="new-password"
+            ref={signupPasswordRef}
           />
           <Checkbox
             name="acceptTerms"

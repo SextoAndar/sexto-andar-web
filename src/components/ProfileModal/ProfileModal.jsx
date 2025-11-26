@@ -85,6 +85,34 @@ function ProfileModal({ user, onClose }) {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!window.confirm('Tem certeza que deseja excluir sua conta permanentemente? Esta ação é IRREVERSÍVEL.')) {
+      return; // Usuário cancelou
+    }
+
+    if (!window.confirm('Você está CONSCIENTE de que todos os seus dados, propriedades, propostas e visitas serão APAGADOS de forma PERMANENTE?')) {
+      return; // Usuário cancelou
+    }
+
+    try {
+      await authService.deleteAccount();
+      alert('Sua conta foi excluída permanentemente. Você será desconectado.');
+      onClose(); // Close the profile modal
+      window.location.href = '/'; // Redirect to home/login page
+    } catch (error) {
+      let errorMessage = 'Ocorreu um erro ao excluir sua conta. Por favor, tente novamente.';
+      if (error.message.includes('Não autenticado')) {
+        errorMessage = 'Sessão expirada ou não autorizado. Por favor, faça login novamente.';
+        onClose();
+        window.location.href = '/';
+      } else if (error.message) {
+        errorMessage = error.message; // Use the specific error message from authService
+      }
+      alert(`Erro: ${errorMessage}`);
+      console.error('Erro detalhado ao excluir conta:', error);
+    }
+  };
+
 
   const refreshProfilePicture = (hasProfilePicture) => {
     if (hasProfilePicture) {
@@ -276,6 +304,9 @@ function ProfileModal({ user, onClose }) {
               <div className="profile-actions" style={{ marginTop: '2rem' }}>
                 <button className="action-btn secondary" onClick={() => setIsEditing(true)}>
                   ✏️ Editar Perfil
+                </button>
+                <button className="action-btn danger" onClick={handleDeleteAccount} style={{ marginLeft: '1rem' }}>
+                  🗑️ Excluir Conta
                 </button>
               </div>
             </>

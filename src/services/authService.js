@@ -435,6 +435,49 @@ export const authService = {
   getUserRole() {
     const user = this.getUser();
     return user ? user.role : null;
+  },
+
+  // Deleção Permanente de Conta
+  async deleteAccount() {
+    const endpoint = `${API_URL}/me`;
+    const currentUser = this.getUser();
+
+    console.log('-------------------- DELETE ACCOUNT INITIATED --------------------');
+    console.log(`💀 Attempting to delete account for user: ${currentUser?.username}`);
+    console.log(`➡️ Requesting DELETE ${endpoint}`);
+    console.log(`➡️ Request Headers: ${JSON.stringify({})}`); // No special headers needed, JWT via cookie
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'DELETE',
+        credentials: 'include' // Important for sending cookies
+      });
+
+      console.log(`📡 Response Status: ${response.status} ${response.statusText}`);
+      console.log(`📡 Response Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
+
+      if (response.status === 204) { // 204 No Content for success
+        console.log('✅ Conta excluída com sucesso (204 No Content).');
+        // The backend should handle invalidating the token; frontend just clears local state
+        return { success: true };
+      } else if (response.status === 400) {
+        const errorData = await response.json();
+        console.error('❌ Erro 400 ao excluir conta:', errorData.detail);
+        throw new Error(errorData.detail);
+      } else if (response.status === 401) {
+        console.error('❌ Não autorizado: usuário não autenticado ou sessão expirada.');
+        throw new Error('Sessão expirada ou não autorizado. Por favor, faça login novamente.');
+      } else {
+        const errorData = await response.json().catch(() => null);
+        console.error('❌ Erro desconhecido ao excluir conta:', response.status, response.statusText, errorData);
+        throw new Error(errorData?.detail || `Ocorreu um erro (${response.status}) ao excluir sua conta.`);
+      }
+    } catch (error) {
+      console.error(`❌ Global error during account deletion:`, error);
+      throw error;
+    } finally {
+        console.log('-------------------- DELETE ACCOUNT ENDED --------------------');
+    }
   }
 };
 

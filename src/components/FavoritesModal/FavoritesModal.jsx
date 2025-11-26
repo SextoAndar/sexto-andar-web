@@ -18,8 +18,9 @@ function FavoritesModal({ isOpen, onClose, user }) {
     setLoading(true);
     try {
       const data = await fetchFavoriteProperties({ page, size: 10 });
-      if (data && Array.isArray(data.properties)) { 
-        setFavorites(data.properties); 
+
+      if (data && Array.isArray(data.favorites)) { 
+        setFavorites(data.favorites); 
         setTotalPages(data.total_pages);
       } else {
         setFavorites([]);

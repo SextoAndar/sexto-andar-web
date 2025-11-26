@@ -26,6 +26,19 @@ function EditProfileForm({ user, onSave, onCancel }) {
     return ''; // No error
   };
 
+  const validateEmail = (email) => {
+    if (!email.trim()) {
+      return 'Email é obrigatório.';
+    }
+    if (email.length > 255) {
+      return 'Máximo de 255 caracteres.';
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      return 'Formato de email inválido.';
+    }
+    return ''; // No error
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -40,6 +53,10 @@ function EditProfileForm({ user, onSave, onCancel }) {
       const error = validateFullName(value);
       setFormErrors(prev => ({ ...prev, fullName: error }));
     }
+    if (name === 'email') {
+      const error = validateEmail(value);
+      setFormErrors(prev => ({ ...prev, email: error }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -48,8 +65,13 @@ function EditProfileForm({ user, onSave, onCancel }) {
 
     // Pre-submission validation
     const fullNameError = validateFullName(formData.fullName);
-    if (fullNameError) {
-      setFormErrors(prev => ({ ...prev, fullName: fullNameError }));
+    const emailError = validateEmail(formData.email);
+    if (fullNameError || emailError) {
+      setFormErrors(prev => ({
+        ...prev,
+        fullName: fullNameError,
+        email: emailError,
+      }));
       return;
     }
     // ... other validations ...
@@ -101,7 +123,7 @@ function EditProfileForm({ user, onSave, onCancel }) {
   };
 
   const needsPassword = formData.email !== user.email || formData.newPassword;
-  const isSubmitDisabled = isLoading || !!formErrors.fullName;
+  const isSubmitDisabled = isLoading || !!formErrors.fullName || !!formErrors.email;
 
   return (
     <form className="edit-profile-form" onSubmit={handleSubmit}>
@@ -138,6 +160,7 @@ function EditProfileForm({ user, onSave, onCancel }) {
         required
         autoComplete="email"
       />
+      {formErrors.email && <div className="error-message-text">{formErrors.email}</div>}
 
       <div className="password-section">
         <h4>Alterar Senha (opcional)</h4>
@@ -183,7 +206,7 @@ function EditProfileForm({ user, onSave, onCancel }) {
         <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading}>
           Cancelar
         </Button>
-        <Button type="submit" variant="primary" disabled={isLoading}>
+        <Button type="submit" variant="primary" disabled={isSubmitDisabled}>
           {isLoading ? 'Salvando...' : 'Salvar Alterações'}
         </Button>
       </div>

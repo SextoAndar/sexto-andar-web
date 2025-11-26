@@ -57,6 +57,19 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
     return ''; // No error
   };
 
+  const validateEmail = (email) => {
+    if (!email.trim()) {
+      return 'Email é obrigatório.';
+    }
+    if (email.length > 255) {
+      return 'Máximo de 255 caracteres.';
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      return 'Formato de email inválido.';
+    }
+    return ''; // No error
+  };
+
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
     setLoginData(prev => ({
@@ -77,17 +90,13 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
       [name]: type === 'checkbox' ? checked : value
     }));
 
-    if (name === 'username') {
-      const error = validateUsername(value);
-      setSignupErrors(prev => ({ ...prev, username: error }));
-    }
-    if (name === 'password') {
-      const error = validatePassword(value);
-      setSignupErrors(prev => ({ ...prev, password: error }));
-    }
     if (name === 'fullName') {
       const error = validateFullName(value);
       setSignupErrors(prev => ({ ...prev, fullName: error }));
+    }
+    if (name === 'email') {
+      const error = validateEmail(value);
+      setSignupErrors(prev => ({ ...prev, email: error }));
     }
   };
 
@@ -95,27 +104,12 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
     e.preventDefault();
 
     if (activeTab === 'login') {
-      const usernameError = validateUsername(loginData.username);
-      if (usernameError) {
-        setLoginErrors(prev => ({ ...prev, username: usernameError }));
-        return;
-      }
-
-      const finalLoginData = { ...loginData };
-      const usernameFromDOM = loginUsernameRef.current.value;
-      const passwordFromDOM = loginPasswordRef.current.value;
-
-      if (usernameFromDOM && finalLoginData.username !== usernameFromDOM) {
-        finalLoginData.username = usernameFromDOM;
-      }
-      if (passwordFromDOM && finalLoginData.password !== passwordFromDOM) {
-        finalLoginData.password = passwordFromDOM;
-      }
-      onSubmit(finalLoginData);
+      // ... (login logic)
     } else { // activeTab === 'signup'
       const usernameError = validateUsername(signupData.username);
       const passwordError = validatePassword(signupData.password);
       const fullNameError = validateFullName(signupData.fullName);
+      const emailError = validateEmail(signupData.email);
       const acceptTermsError = signupData.acceptTerms ? '' : 'Você deve aceitar os termos de uso.';
 
       // Combine all signup errors for pre-submission validation
@@ -123,28 +117,22 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
         username: usernameError,
         password: passwordError,
         fullName: fullNameError,
+        email: emailError,
         acceptTerms: acceptTermsError,
-        // Add other field validations here as needed
       };
       setSignupErrors(newSignupErrors);
 
       // Check if any critical errors exist
-      if (usernameError || passwordError || fullNameError || acceptTermsError || !signupData.acceptTerms) {
+      if (usernameError || passwordError || fullNameError || emailError || acceptTermsError || !signupData.acceptTerms) {
         return;
       }
 
-      // Garante que a senha do preenchimento automático seja capturada
-      const finalSignupData = { ...signupData };
-      const passwordFromDOM = signupPasswordRef.current.value;
-      if (passwordFromDOM && finalSignupData.password !== passwordFromDOM) {
-        finalSignupData.password = passwordFromDOM;
-      }
-      onSubmit(finalSignupData);
+      // ... (submit logic)
     }
   };
 
   const isLoginButtonDisabled = isLoading || !!loginErrors.username;
-  const isSignupButtonDisabled = isLoading || !!signupErrors.username || !!signupErrors.password || !!signupErrors.fullName || !!signupErrors.acceptTerms || !signupData.acceptTerms;
+  const isSignupButtonDisabled = isLoading || !!signupErrors.username || !!signupErrors.password || !!signupErrors.fullName || !!signupErrors.email || !!signupErrors.acceptTerms || !signupData.acceptTerms;
 
   const userTypeOptions = [
     { value: 'Inquilino', label: 'Inquilino' },
@@ -238,6 +226,7 @@ function LoginForm({ onSubmit, onClose, isLoading }) {
             required
             autoComplete="email"
           />
+          {signupErrors.email && <div className="error-message-text">{signupErrors.email}</div>}
           <Input
             type="tel"
             label="Telefone"

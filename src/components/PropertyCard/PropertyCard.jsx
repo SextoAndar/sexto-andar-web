@@ -42,25 +42,33 @@ function PropertyCard({ property, onDetails, onEdit, onUnfavorite, onDelete, onR
       <div className="property-card-header">
         <span className={`tag ${property.is_active ? '' : 'inactive'}`}>{property.is_active ? 'Disponível' : 'Inativo'}</span>
         <span className="tag">{property.propertyType === 'APARTMENT' ? 'Apartamento' : 'Casa'}</span>
-        {property.petFriendly && <span className="tag">Pet friendly</span>}
+        {property.propertyType === 'APARTMENT' && property.isPetAllowed && <span className="tag">Pet friendly</span>}
       </div>
       <img src={imgUrl} alt="Foto do imóvel" className="property-image" />
       <div className="property-card-body">
-        <div className="property-rating">
-          <span>⭐ {property.rating || '4.8'} ({property.reviews || 24})</span>
-        </div>
         <div className="property-price">
           <span className="price">R$ {Number(property.propertyValue).toLocaleString('pt-BR')}</span>
-          {property.condoFee && <span className="property-cond">+ R$ {property.condoFee} cond.</span>}
+          {property.propertyType === 'APARTMENT' && property.condominiumFee && 
+            <span className="property-cond"> + R$ {Number(property.condominiumFee).toLocaleString('pt-BR')} cond.</span>
+          }
         </div>
-        <div className="property-title">{property.description}</div>
         <div className="property-address">
           {property.address?.street}, {property.address?.number} - {property.address?.city}
         </div>
         <div className="property-features">
-          <span>🛏 {property.bedrooms}</span>
-          <span>🛁 {property.bathrooms}</span>
           <span>📐 {property.propertySize}m²</span>
+          {property.propertyType === 'APARTMENT' && (
+            <>
+              {property.floor !== undefined && <span>Andar: {property.floor}</span>}
+              {property.commonArea && <span>Área Comum: Sim</span>}
+            </>
+          )}
+          {property.propertyType === 'HOUSE' && (
+            <>
+              {property.landPrice && <span>Terreno: R$ {Number(property.landPrice).toLocaleString('pt-BR')}</span>}
+              {property.isSingleHouse && <span>Casa Isolada: Sim</span>}
+            </>
+          )}
         </div>
         {variant === 'edit' ? (
           <div className="property-card-actions">

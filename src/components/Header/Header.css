@@ -10,7 +10,7 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  transition: background 0.15s, color 0.15s, border 0.15s;
+  transition: all 0.3s ease; /* Adjusted for consistency */
   box-shadow: 0 1px 4px rgba(25, 118, 210, 0.04);
 }
 .header-logout-btn:hover {
@@ -23,6 +23,7 @@
   margin-right: 6px;
   vertical-align: middle;
 }
+
 .header {
   background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -63,10 +64,12 @@
   color: #00a868;
 }
 
-.header-nav {
-  display: flex;
-  gap: 2rem;
+/* Desktop Navigation and User Section */
+.header-nav.desktop-nav,
+.header-user-desktop {
+  display: flex; /* Default to flex for desktop-first */
   align-items: center;
+  gap: 2rem;
 }
 
 .nav-link {
@@ -77,13 +80,12 @@
   color: #666;
   font-weight: 500;
   transition: color 0.2s;
+  white-space: nowrap; /* Prevent wrapping for desktop links */
 }
 
 .nav-link:hover {
   color: #00a868;
 }
-
-
 
 .nav-icon {
   font-size: 1.2rem;
@@ -122,6 +124,7 @@
   border-radius: 25px;
   transition: background-color 0.2s;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .user-profile-btn:hover {
@@ -142,7 +145,7 @@
   border: 2px solid #00a868;
 }
 
-.logout-btn {
+.logout-btn { /* This might be an old class, ensuring it's defined */
   background-color: transparent;
   color: #666;
   border: 1px solid #ddd;
@@ -161,16 +164,83 @@
   color: #00a868;
 }
 
+/* Hamburger Menu Toggle */
+.hamburger-menu-toggle {
+  display: none; /* Hidden by default on desktop */
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #333;
+  z-index: 101; /* Above other content */
+  padding: 0.5rem;
+}
+
+/* Mobile Menu Container */
+.mobile-menu {
+  display: none; /* Hidden by default on desktop */
+  position: absolute;
+  top: 100%; /* Position below the header */
+  left: 0;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-direction: column;
+  padding: 1rem 0;
+  z-index: 99; /* Below toggle, above content */
+  transform: translateY(-100%); /* Start off-screen */
+  transition: transform 0.3s ease-in-out;
+}
+
+.mobile-menu.open {
+  display: flex; /* Show when open */
+  transform: translateY(0); /* Slide into view */
+}
+
+.mobile-nav-links,
+.mobile-user-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 2rem;
+}
+
+.mobile-nav-links .nav-link,
+.mobile-user-actions .user-profile-btn,
+.mobile-user-actions .header-login-btn,
+.mobile-user-actions .header-logout-btn {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+}
+
+.mobile-user-actions .header-logout-btn {
+  margin-left: 0; /* Override desktop margin */
+}
+
+
+/* Media Queries for Responsiveness */
 @media (max-width: 768px) {
   .header-container {
-    padding: 1rem;
+    padding: 0.75rem 1rem; /* Adjust padding for smaller screens */
+    gap: 1rem;
   }
 
-  .header-nav {
-    display: none;
+  .header-nav.desktop-nav,
+  .header-user-desktop {
+    display: none; /* Hide desktop nav and user section on small screens */
   }
 
-  .header-login-btn {
-    padding: 0.5rem 1rem;
+  .hamburger-menu-toggle {
+    display: block; /* Show hamburger icon on small screens */
+  }
+
+  .header-logo {
+    font-size: 1.2rem; /* Adjust logo size */
+  }
+
+  .logo-icon {
+    font-size: 1.5rem;
   }
 }

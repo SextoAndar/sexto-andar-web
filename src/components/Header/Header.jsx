@@ -20,10 +20,12 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
   const [isMyVisitsModalOpen, setIsMyVisitsModalOpen] = useState(false);
   const [isReceivedVisitsModalOpen, setIsReceivedVisitsModalOpen] = useState(false);
   const [ownerProperties, setOwnerProperties] = useState([]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // State for mobile menu
 
   const handleLogout = async () => {
     await authService.logout();
     if (onLogout) onLogout();
+    setIsMobileMenuOpen(false); // Close mobile menu on logout
   };
 
   const getProfilePictureUrl = (userId, hasProfilePicture) => {
@@ -87,7 +89,11 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
             </span>
           </div>
 
-          <nav className="header-nav">
+          <button className="hamburger-menu-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? '✕' : '☰'}
+          </button>
+
+          <nav className="header-nav desktop-nav"> {/* Desktop navigation */}
             {(!user || (user.role !== 'USER' && user.role !== 'ADMIN')) && (
               <a href="#" className="nav-link" onClick={handleAnnounceClick}>
                 <span className="nav-icon">➕</span>
@@ -128,24 +134,91 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
             )}
           </nav>
 
-          {user ? (
-            <div className="header-user">
-              <button className="user-profile-btn" onClick={onProfileClick}>
-                <span className="user-name">{user.fullName || user.username}</span>
-                <img
-                  src={getProfilePictureUrl(user.id, user.hasProfilePicture)}
-                  alt="Profile"
-                  className="user-avatar"
-                  onError={(e) => e.target.src = '/default-pp.png'}
-                />
+          <div className="header-user-desktop"> {/* Desktop user section */}
+            {user ? (
+              <div className="header-user">
+                <button className="user-profile-btn" onClick={onProfileClick}>
+                  <span className="user-name">{user.fullName || user.username}</span>
+                  <img
+                    src={getProfilePictureUrl(user.id, user.hasProfilePicture)}
+                    alt="Profile"
+                    className="user-avatar"
+                    onError={(e) => e.target.src = '/default-pp.png'}
+                  />
+                </button>
+                <button className="header-logout-btn" onClick={handleLogout} title="Sair">Sair</button>
+              </div>
+            ) : (
+              <button className="header-login-btn" onClick={onLoginClick}>
+                Entrar
               </button>
-              <button className="header-logout-btn" onClick={handleLogout} title="Sair">Sair</button>
-            </div>
-          ) : (
-            <button className="header-login-btn" onClick={onLoginClick}>
-              Entrar
-            </button>
-          )}
+            )}
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <div className={`mobile-menu ${isMobileMenuOpen ? 'open' : ''}`}>
+          <nav className="mobile-nav-links">
+            {(!user || (user.role !== 'USER' && user.role !== 'ADMIN')) && (
+              <a href="#" className="nav-link" onClick={() => { handleAnnounceClick(); setIsMobileMenuOpen(false); }}>
+                <span className="nav-icon">➕</span>
+                Anunciar
+              </a>
+            )}
+            {user && user.role === 'PROPERTY_OWNER' && (
+              <>
+                <a href="#" className="nav-link" onClick={() => { handleMyPropertiesClick(); setIsMobileMenuOpen(false); }}>
+                  <span className="nav-icon">🏠</span>
+                  Minhas Propriedades
+                </a>
+                <a href="#" className="nav-link" onClick={() => { handleProposalsClick(); setIsMobileMenuOpen(false); }}>
+                  <span className="nav-icon">✉️</span>
+                  Propostas Recebidas
+                </a>
+                <a href="#" className="nav-link" onClick={() => { handleReceivedVisitsClick(); setIsMobileMenuOpen(false); }}>
+                  <span className="nav-icon">🗓️</span>
+                  Visitas Recebidas
+                </a>
+              </>
+            )}
+            {user && user.role === 'USER' && (
+              <>
+                <a href="#" className="nav-link" onClick={() => { handleFavoritesClick(); setIsMobileMenuOpen(false); }}>
+                  <span className="nav-icon">❤️</span>
+                  Favoritos
+                </a>
+                <a href="#" className="nav-link" onClick={() => { handleMyProposalsClick(); setIsMobileMenuOpen(false); }}>
+                  <span className="nav-icon">✉️</span>
+                  Minhas Propostas
+                </a>
+                <a href="#" className="nav-link" onClick={() => { handleMyVisitsClick(); setIsMobileMenuOpen(false); }}>
+                  <span className="nav-icon">🗓️</span>
+                  Minhas Visitas
+                </a>
+              </>
+            )}
+          </nav>
+
+          <div className="mobile-user-actions">
+            {user ? (
+              <>
+                <button className="user-profile-btn" onClick={() => { onProfileClick(); setIsMobileMenuOpen(false); }}>
+                  <span className="user-name">{user.fullName || user.username}</span>
+                  <img
+                    src={getProfilePictureUrl(user.id, user.hasProfilePicture)}
+                    alt="Profile"
+                    className="user-avatar"
+                    onError={(e) => e.target.src = '/default-pp.png'}
+                  />
+                </button>
+                <button className="header-logout-btn" onClick={handleLogout} title="Sair">Sair</button>
+              </>
+            ) : (
+              <button className="header-login-btn" onClick={() => { onLoginClick(); setIsMobileMenuOpen(false); }}>
+                Entrar
+              </button>
+            )}
+          </div>
         </div>
       </header>
       <PropertyRegisterModal isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} />

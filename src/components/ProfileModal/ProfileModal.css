@@ -1,7 +1,7 @@
 .profile-modal-content {
-  width: 100%;
+  width: 100%; /* Ensure it takes full available width */
   max-width: 900px;
-  min-width: 700px;
+  margin: 0 auto; /* Center it horizontally */
 }
 
 .profile-header {

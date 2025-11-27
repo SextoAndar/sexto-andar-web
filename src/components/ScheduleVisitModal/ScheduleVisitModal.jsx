@@ -12,9 +12,17 @@ function ScheduleVisitModal({ isOpen, onClose, onSchedule }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    // Convert visitDate from datetime-local string to UTC ISO 8601 string
+    // datetime-local gives "YYYY-MM-DDTHH:mm".
+    // When passed to Date constructor, it's parsed as local time.
+    // toISOString() then converts this local time to UTC.
+    const localDateTime = new Date(visitDate);
+    const utcVisitDate = localDateTime.toISOString();
+
     try {
       await onSchedule({
-        visitDate,
+        visitDate: utcVisitDate, // Send UTC ISO string
         notes: notes || '',
       });
       // onSchedule handles success message and closing

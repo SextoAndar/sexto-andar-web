@@ -53,6 +53,7 @@ export async function getVisitById(visitId) {
 }
 
 export async function scheduleVisit(visitData) {
+  logger.log('Scheduling visit with payload:', visitData); // Log the payload
   const res = await fetch('/api/api/visits/', {
     method: 'POST',
     headers: {

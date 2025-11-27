@@ -53,7 +53,10 @@
 }
 
 .logo-icon {
-  font-size: 2rem;
+  width: 40px; /* Adjust as needed */
+  height: 40px; /* Adjust as needed */
+  object-fit: contain;
+  vertical-align: middle; /* Align with text */
 }
 
 .logo-text {

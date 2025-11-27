@@ -84,7 +84,7 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
       <header className="header">
         <div className="header-container">
           <div className="header-logo">
-            <span className="logo-icon">🏢</span>
+            <img src="/logo.png" alt="Sexto Andar Logo" className="logo-icon" />
             <span className="logo-text">
               Sexto <span className="logo-highlight">Andar</span>
             </span>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // Corrected React import
+import React, { useState, useEffect, useCallback } from 'react'; // Add useCallback
 import Modal from '../common/Modal/Modal';
 import Button from '../common/Button/Button';
 import PropertyCard from '../PropertyCard/PropertyCard';
@@ -22,8 +22,10 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
   const [selectedPropertyForVisits, setSelectedPropertyForVisits] = useState(null);
   const [currentPage, setCurrentPage] = useState(1); // Add currentPage state
   const [totalPages, setTotalPages] = useState(0); // Add totalPages state
+  const [isLoading, setIsLoading] = useState(false); // Add this
 
-  const loadActiveProperties = async (page = 1) => {
+  const loadActiveProperties = useCallback(async (page = 1) => {
+    setIsLoading(true); // Add loading state
     try {
       const data = await fetchOwnerProperties({ page, size: 10, active_only: true });
       if (data && Array.isArray(data.properties)) {
@@ -37,14 +39,16 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
       logger.error(error.message);
       setProperties([]);
       setTotalPages(0);
+    } finally {
+      setIsLoading(false); // Ensure setLoading(false) is called in finally block
     }
-  };
+  }, []); // Empty array because setStates are stable and fetchOwnerProperties is stable.
 
   useEffect(() => {
     if (isOpen) {
       loadActiveProperties(currentPage);
     }
-  }, [isOpen, currentPage]);
+  }, [isOpen, currentPage, loadActiveProperties]);
 
   const handleEditProperty = (propertyId) => {
     const propertyToEdit = properties.find(p => p.id === propertyId);
@@ -124,7 +128,9 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
         }
       >
         <div className="owner-properties-list">
-          {properties && properties.length > 0 ? (
+          {isLoading ? ( // Add this conditional check
+            <p>Carregando propriedades...</p> // Loading message
+          ) : properties && properties.length > 0 ? (
             properties.map(property => (
               <PropertyCard 
                 key={property.id} 

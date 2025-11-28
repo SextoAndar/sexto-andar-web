@@ -9,7 +9,7 @@ import Pagination from '../common/Pagination/Pagination'; // Import Pagination c
 import logger from '../../utils/logger'; // Import logger utility
 import './MyProposalsModal.css';
 
-function MyProposalsModal({ isOpen, onClose, user }) {
+function MyProposalsModal({ isOpen, onClose, _user }) {
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedProposalId, setSelectedProposalId] = useState(null);

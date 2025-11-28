@@ -20,7 +20,7 @@ function Home() {
       try {
         const userData = await authService.getMe();
         setUser(userData);
-      } catch (err) {
+      } catch (_err) {
         authService.logout();
         // Não abre o modal de login automaticamente ao carregar a página
         // Apenas garante que o usuário esteja deslogado

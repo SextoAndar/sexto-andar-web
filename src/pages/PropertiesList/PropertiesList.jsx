@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { fetchProperties } from '../../services/propertyService';
 import PropertyCard from '../../components/PropertyCard/PropertyCard';
 import PropertyDetailsModal from '../../components/PropertyDetailsModal/PropertyDetailsModal';
@@ -15,32 +15,35 @@ export default function PropertiesList({ user, searchTerm }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
 
-  useEffect(() => {
+  const loadProperties = useCallback(async () => {
     setLoading(true);
     const params = { page: currentPage, size: 10 };
     if (searchTerm) {
       params.search_term = searchTerm;
     }
     
-
-    fetchProperties(params)
-      .then(data => {
-        if (data && Array.isArray(data.properties)) { 
-          setProperties(data.properties);
-          setTotalPages(data.total_pages);
-        } else {
-          setProperties([]); 
-          setTotalPages(0);
-        }
-      })
-      .catch(err => {
-        logger.error(err.message);
-        setError(err.message);
+    try {
+      const data = await fetchProperties(params);
+      if (data && Array.isArray(data.properties)) { 
+        setProperties(data.properties);
+        setTotalPages(data.total_pages);
+      } else {
         setProperties([]); 
         setTotalPages(0);
-      })
-      .finally(() => setLoading(false));
-  }, [searchTerm, currentPage]);
+      }
+    } catch (_err) { // Changed to _err
+      logger.error(_err.message);
+      setError(_err.message);
+      setProperties([]); 
+      setTotalPages(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [searchTerm, currentPage]); // Depends on searchTerm and currentPage
+
+  useEffect(() => {
+    loadProperties();
+  }, [searchTerm, currentPage, loadProperties]);
 
   const handleOpenDetails = (propertyId) => {
     setSelectedPropertyId(propertyId);

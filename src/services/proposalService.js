@@ -1,4 +1,4 @@
-import logger from '../utils/logger';
+
 
 export async function getReceivedProposals({ page = 1, size = 10 } = {}) {
   const url = new URL('/api/api/proposals/received', window.location.origin);

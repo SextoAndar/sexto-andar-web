@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Modal from '../common/Modal/Modal';
 import VisitCard from '../VisitCard/VisitCard';
 import { getAllOwnerVisits, getVisitsForSpecificProperty, cancelVisit, completeVisit } from '../../services/visitService';
@@ -12,7 +12,7 @@ function ReceivedVisitsModal({ isOpen, onClose, propertyId }) {
   const [currentPage, setCurrentPage] = useState(1); // Add currentPage state
   const [totalPages, setTotalPages] = useState(0); // Add totalPages state
 
-  const loadVisits = async (page = 1) => {
+  const loadVisits = useCallback(async (page = 1) => {
     setLoading(true);
     try {
       const data = propertyId
@@ -33,13 +33,13 @@ function ReceivedVisitsModal({ isOpen, onClose, propertyId }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [propertyId]);
 
   useEffect(() => {
     if (isOpen) {
       loadVisits(currentPage);
     }
-  }, [isOpen, propertyId, currentPage]); // Added currentPage to dependencies
+  }, [isOpen, propertyId, currentPage, loadVisits]); // Add loadVisits here
 
   const handleCancel = async (visitId) => {
     if (window.confirm('Tem certeza que deseja cancelar esta visita?')) {

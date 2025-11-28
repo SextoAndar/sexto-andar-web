@@ -1,5 +1,5 @@
 // Serviço para buscar propriedades
-import logger from '../utils/logger';
+
 export async function fetchProperties({ page = 1, size = 12, ...params } = {}) {
   const url = new URL('/api/api/properties/', window.location.origin);
   url.searchParams.set('page', page);

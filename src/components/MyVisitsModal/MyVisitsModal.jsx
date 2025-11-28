@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Modal from '../common/Modal/Modal';
 import VisitCard from '../VisitCard/VisitCard';
 import { getVisitsForUser, getUpcomingVisits, cancelVisit } from '../../services/visitService';
@@ -16,7 +16,7 @@ function MyVisitsModal({ isOpen, onClose }) {
   const [currentPage, setCurrentPage] = useState(1); // Add currentPage state
   const [totalPages, setTotalPages] = useState(0); // Add totalPages state
 
-  const loadVisits = async (page = 1) => {
+  const loadVisits = useCallback(async (page = 1) => {
     setLoading(true);
     try {
       const data = activeTab === 'upcoming' 
@@ -37,7 +37,7 @@ function MyVisitsModal({ isOpen, onClose }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab]);
 
   useEffect(() => {
     if (isOpen) {
@@ -48,7 +48,7 @@ function MyVisitsModal({ isOpen, onClose }) {
         loadVisits(currentPage);
       }
     }
-  }, [isOpen, activeTab, currentPage]); // Added currentPage to dependencies
+  }, [isOpen, activeTab, currentPage, loadVisits]); // Add loadVisits here
 
   const handleCancel = async (visitId) => {
     if (window.confirm('Tem certeza que deseja cancelar esta visita?')) {

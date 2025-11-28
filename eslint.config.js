@@ -23,7 +23,23 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-unused-vars': ['error', {
+        varsIgnorePattern: '^[A-Z_]',
+        argsIgnorePattern: '^_|^[A-Z_]',
+        caughtErrorsIgnorePattern: '^_',
+      }],
     },
   },
+  { // Override for vite.config.js specifically
+    files: ['vite.config.js'],
+    languageOptions: {
+      // For vite.config.js, it's a Node.js context.
+      globals: globals.node,    // Add Node.js globals
+      ecmaVersion: 2020, // Keep consistent
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+    },
+  }
 ])

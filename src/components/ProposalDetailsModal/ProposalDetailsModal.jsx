@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Modal from '../common/Modal/Modal';
 import { getProposalById } from '../../services/proposalService';
 import './ProposalDetailsModal.css';
@@ -22,15 +22,23 @@ function ProposalDetailsModal({ isOpen, onClose, proposalId }) {
   const [proposal, setProposal] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const fetchProposalDetails = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getProposalById(proposalId);
+      setProposal(data);
+    } catch (_err) { // Changed to _err
+      console.error(_err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [proposalId]); // Depends on proposalId
+
   useEffect(() => {
     if (isOpen && proposalId) {
-      setLoading(true);
-      getProposalById(proposalId)
-        .then(setProposal)
-        .catch(err => console.error(err.message))
-        .finally(() => setLoading(false));
+      fetchProposalDetails();
     }
-  }, [isOpen, proposalId]);
+  }, [isOpen, proposalId, fetchProposalDetails]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Detalhes da Proposta">

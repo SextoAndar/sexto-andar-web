@@ -5,7 +5,7 @@ import Select from '../common/Select/Select';
 import Checkbox from '../common/Checkbox/Checkbox';
 import './LoginForm.css';
 
-function LoginForm({ onSubmit, onClose, isLoading }) {
+function LoginForm({ onSubmit, _onClose, isLoading }) {
   const [activeTab, setActiveTab] = useState('login');
   const [loginData, setLoginData] = useState({
     username: '',

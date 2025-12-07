@@ -1,5 +1,6 @@
 
 
+import { MdSquareFoot } from 'react-icons/md';
 import './PropertyCard.css';
 
 
@@ -56,7 +57,7 @@ function PropertyCard({ property, onDetails, onEdit, onUnfavorite, onDelete, onR
           {property.address?.street}, {property.address?.number} - {property.address?.city}
         </div>
         <div className="property-features">
-          <span>📐 {property.propertySize}m²</span>
+          <span><MdSquareFoot /> {property.propertySize}m²</span>
           {property.propertyType === 'APARTMENT' && (
             <>
               {property.floor !== undefined && <span>Andar: {property.floor}</span>}

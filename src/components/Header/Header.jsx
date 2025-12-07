@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import authService from '../../services/authService';
 import { fetchOwnerProperties } from '../../services/propertyService';
 import logger from '../../utils/logger'; // Import logger utility
+import { MdAddCircleOutline, MdHome, MdMailOutline, MdCalendarToday, MdFavoriteBorder } from 'react-icons/md';
 import './Header.css';
 import PropertyRegisterModal from '../PropertyRegisterModal/PropertyRegisterModal';
 import OwnerPropertiesModal from '../OwnerPropertiesModal/OwnerPropertiesModal';
@@ -97,22 +98,22 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
           <nav className="header-nav desktop-nav"> {/* Desktop navigation */}
             {(!user || (user.role !== 'USER' && user.role !== 'ADMIN')) && (
               <a href="#" className="nav-link" onClick={handleAnnounceClick}>
-                <span className="nav-icon">➕</span>
+                <MdAddCircleOutline className="nav-icon" />
                 Anunciar
               </a>
             )}
             {user && user.role === 'PROPERTY_OWNER' && (
               <>
                 <a href="#" className="nav-link" onClick={handleMyPropertiesClick}>
-                  <span className="nav-icon">🏠</span>
+                  <MdHome className="nav-icon" />
                   Minhas Propriedades
                 </a>
                 <a href="#" className="nav-link" onClick={handleProposalsClick}>
-                  <span className="nav-icon">✉️</span>
+                  <MdMailOutline className="nav-icon" />
                   Propostas Recebidas
                 </a>
                 <a href="#" className="nav-link" onClick={handleReceivedVisitsClick}>
-                  <span className="nav-icon">🗓️</span>
+                  <MdCalendarToday className="nav-icon" />
                   Visitas Recebidas
                 </a>
               </>
@@ -120,15 +121,15 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
             {user && user.role === 'USER' && (
               <>
                 <a href="#" className="nav-link" onClick={handleFavoritesClick}>
-                  <span className="nav-icon">❤️</span>
+                  <MdFavoriteBorder className="nav-icon" />
                   Favoritos
                 </a>
                 <a href="#" className="nav-link" onClick={handleMyProposalsClick}>
-                  <span className="nav-icon">✉️</span>
+                  <MdMailOutline className="nav-icon" />
                   Minhas Propostas
                 </a>
                 <a href="#" className="nav-link" onClick={handleMyVisitsClick}>
-                  <span className="nav-icon">🗓️</span>
+                  <MdCalendarToday className="nav-icon" />
                   Minhas Visitas
                 </a>
               </>
@@ -162,22 +163,22 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
           <nav className="mobile-nav-links">
             {(!user || (user.role !== 'USER' && user.role !== 'ADMIN')) && (
               <a href="#" className="nav-link" onClick={() => { handleAnnounceClick(); setIsMobileMenuOpen(false); }}>
-                <span className="nav-icon">➕</span>
+                <MdAddCircleOutline className="nav-icon" />
                 Anunciar
               </a>
             )}
             {user && user.role === 'PROPERTY_OWNER' && (
               <>
                 <a href="#" className="nav-link" onClick={() => { handleMyPropertiesClick(); setIsMobileMenuOpen(false); }}>
-                  <span className="nav-icon">🏠</span>
+                  <MdHome className="nav-icon" />
                   Minhas Propriedades
                 </a>
                 <a href="#" className="nav-link" onClick={() => { handleProposalsClick(); setIsMobileMenuOpen(false); }}>
-                  <span className="nav-icon">✉️</span>
+                  <MdMailOutline className="nav-icon" />
                   Propostas Recebidas
                 </a>
                 <a href="#" className="nav-link" onClick={() => { handleReceivedVisitsClick(); setIsMobileMenuOpen(false); }}>
-                  <span className="nav-icon">🗓️</span>
+                  <MdCalendarToday className="nav-icon" />
                   Visitas Recebidas
                 </a>
               </>
@@ -185,15 +186,15 @@ function Header({ onLoginClick, onProfileClick, user, onLogout }) {
             {user && user.role === 'USER' && (
               <>
                 <a href="#" className="nav-link" onClick={() => { handleFavoritesClick(); setIsMobileMenuOpen(false); }}>
-                  <span className="nav-icon">❤️</span>
+                  <MdFavoriteBorder className="nav-icon" />
                   Favoritos
                 </a>
                 <a href="#" className="nav-link" onClick={() => { handleMyProposalsClick(); setIsMobileMenuOpen(false); }}>
-                  <span className="nav-icon">✉️</span>
+                  <MdMailOutline className="nav-icon" />
                   Minhas Propostas
                 </a>
                 <a href="#" className="nav-link" onClick={() => { handleMyVisitsClick(); setIsMobileMenuOpen(false); }}>
-                  <span className="nav-icon">🗓️</span>
+                  <MdCalendarToday className="nav-icon" />
                   Minhas Visitas
                 </a>
               </>

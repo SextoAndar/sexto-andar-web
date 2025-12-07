@@ -3,6 +3,7 @@ import authService from '../../services/authService';
 import { getPortfolioStats, getFavoritesCount } from '../../services/propertyService';
 import EditProfileForm from '../EditProfileForm/EditProfileForm';
 import logger from '../../utils/logger'; // Import logger utility
+import { MdBusiness, MdCheckCircle, MdHome, MdApartment, MdAttachMoney, MdFavorite, MdCalendarToday, MdBarChart } from 'react-icons/md';
 import './ProfileModal.css';
 
 const StatCard = ({ icon, label, value }) => (
@@ -181,21 +182,21 @@ function ProfileModal({ user, onClose }) {
     if (!stats) return <p>Carregando estatísticas...</p>;
     return (
       <div className="profile-stats owner-stats">
-        <StatCard icon="🏢" label="Total de Imóveis" value={stats.total_properties} />
-        <StatCard icon="✅" label="Imóveis Ativos" value={stats.active_properties} />
-        <StatCard icon="🏠" label="Casas" value={stats.total_houses} />
-        <StatCard icon="🏙️" label="Apartamentos" value={stats.total_apartments} />
-        <StatCard icon="💰" label="Valor do Portfólio" value={formatCurrency(stats.total_portfolio_value)} />
-        <StatCard icon="💸" label="Aluguel Potencial" value={formatCurrency(stats.total_monthly_rent_potential)} />
+        <StatCard icon={<MdBusiness />} label="Total de Imóveis" value={stats.total_properties} />
+        <StatCard icon={<MdCheckCircle />} label="Imóveis Ativos" value={stats.active_properties} />
+        <StatCard icon={<MdHome />} label="Casas" value={stats.total_houses} />
+        <StatCard icon={<MdApartment />} label="Apartamentos" value={stats.total_apartments} />
+        <StatCard icon={<MdAttachMoney />} label="Valor do Portfólio" value={formatCurrency(stats.total_portfolio_value)} />
+        <StatCard icon={<MdAttachMoney />} label="Aluguel Potencial" value={formatCurrency(stats.total_monthly_rent_potential)} />
       </div>
     );
   };
 
   const renderUserStats = () => (
     <div className="profile-stats">
-      <StatCard icon="❤️" label="Favoritos" value={favoritesCount} />
-      <StatCard icon="📅" label="Visitações" value="3" />
-      <StatCard icon="📊" label="Buscas" value="12" />
+      <StatCard icon={<MdFavorite />} label="Favoritos" value={favoritesCount} />
+      <StatCard icon={<MdCalendarToday />} label="Visitações" value="3" />
+      <StatCard icon={<MdBarChart />} label="Buscas" value="12" />
     </div>
   );
 

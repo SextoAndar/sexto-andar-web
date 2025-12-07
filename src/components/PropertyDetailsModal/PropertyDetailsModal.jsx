@@ -6,6 +6,7 @@ import ProposalFormModal from '../ProposalFormModal/ProposalFormModal';
 import ScheduleVisitModal from '../ScheduleVisitModal/ScheduleVisitModal';
 import Pagination from '../common/Pagination/Pagination'; // Import Pagination component
 import logger from '../../utils/logger'; // Import logger utility
+import { MdFavorite, MdFavoriteBorder } from 'react-icons/md';
 import './PropertyDetailsModal.css';
 
 const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
@@ -138,7 +139,7 @@ const PropertyDetailsModal = ({ propertyId, isOpen, onClose, user }) => {
                     className={`favorite-btn ${isFavorited ? 'favorited' : ''}`}
                     onClick={handleFavorite}
                   >
-                    {isFavorited ? '❤️' : '🤍'}
+                    {isFavorited ? <MdFavorite /> : <MdFavoriteBorder />}
                   </button>
                 )}
               </div>

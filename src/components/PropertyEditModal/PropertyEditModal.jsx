@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Modal from '../common/Modal/Modal';
 import Button from '../common/Button/Button'; // Import the Button component
 import * as propertyService from '../../services/propertyService';
+import { MdDelete, MdStar } from 'react-icons/md';
 import './PropertyEditModal.css';
 
 function toBase64(file) {
@@ -216,8 +217,8 @@ const PropertyEditModal = ({ isOpen, onClose, property, onSave, onImageUpdate })
               <div key={img.id} className={`img-container ${img.is_primary ? 'primary' : ''}`}>
                 <img src={`/api/api/images/${img.id}`} alt="Property" />
                 <div className="img-actions">
-                  <button type="button" onClick={() => handleDeleteImage(img.id)} title="Apagar">🗑️</button>
-                  {!img.is_primary && <button type="button" onClick={() => handleSetPrimary(img.id)} title="Definir como principal">⭐</button>}
+                  <button type="button" onClick={() => handleDeleteImage(img.id)} title="Apagar"><MdDelete /></button>
+                  {!img.is_primary && <button type="button" onClick={() => handleSetPrimary(img.id)} title="Definir como principal"><MdStar /></button>}
                 </div>
               </div>
             ))}

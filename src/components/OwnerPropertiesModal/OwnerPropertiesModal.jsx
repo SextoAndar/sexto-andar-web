@@ -9,6 +9,7 @@ import ReceivedVisitsModal from '../ReceivedVisitsModal/ReceivedVisitsModal';
 import Pagination from '../common/Pagination/Pagination'; // Import Pagination component
 import { fetchOwnerProperties, deleteProperty } from '../../services/propertyService';
 import logger from '../../utils/logger'; // Import logger utility
+import { MdDelete } from 'react-icons/md';
 import './OwnerPropertiesModal.css';
 
 function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, user }) {
@@ -123,7 +124,7 @@ function OwnerPropertiesModal({ isOpen, onClose, properties: initialProperties, 
         title="Minhas Propriedades"
         headerChildren={
           <button className="trash-button" onClick={() => setIsTrashModalOpen(true)} title="Lixeira">
-            🗑️
+            <MdDelete />
           </button>
         }
       >

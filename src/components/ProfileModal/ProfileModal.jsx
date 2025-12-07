@@ -3,7 +3,7 @@ import authService from '../../services/authService';
 import { getPortfolioStats, getFavoritesCount } from '../../services/propertyService';
 import EditProfileForm from '../EditProfileForm/EditProfileForm';
 import logger from '../../utils/logger'; // Import logger utility
-import { MdBusiness, MdCheckCircle, MdHome, MdApartment, MdAttachMoney, MdFavorite, MdCalendarToday, MdBarChart } from 'react-icons/md';
+import { MdBusiness, MdCheckCircle, MdHome, MdApartment, MdAttachMoney, MdFavorite, MdCalendarToday, MdBarChart, MdNotifications, MdLogout, MdEdit, MdDelete, MdClose } from 'react-icons/md';
 import './ProfileModal.css';
 
 const StatCard = ({ icon, label, value }) => (
@@ -229,7 +229,7 @@ function ProfileModal({ user, onClose }) {
               disabled={isUploading}
               title="Remover foto"
             >
-              ✖
+              <MdClose />
             </button>
           )}
         </div>
@@ -260,8 +260,8 @@ function ProfileModal({ user, onClose }) {
           {currentUser.role === 'PROPERTY_OWNER' ? renderOwnerStats() : renderUserStats()}
 
           <div className="profile-actions">
-            <button className="action-btn secondary">🔔 Notificações</button>
-            <button className="action-btn danger" onClick={handleLogout}>🚪 Sair</button>
+            <button className="action-btn secondary"><MdNotifications /> Notificações</button>
+            <button className="action-btn danger" onClick={handleLogout}><MdLogout /> Sair</button>
           </div>
         </>
       )}
@@ -303,12 +303,12 @@ function ProfileModal({ user, onClose }) {
                 <p>{formatDate(currentUser.created_at)}</p>
               </div>
 
-              <div className="profile-actions" style={{ marginTop: '2rem' }}>
+              <div className="profile-actions">
                 <button className="action-btn secondary" onClick={() => setIsEditing(true)}>
-                  ✏️ Editar Perfil
+                  <MdEdit /> Editar Perfil
                 </button>
-                <button className="action-btn danger" onClick={handleDeleteAccount} style={{ marginLeft: '1rem' }}>
-                  🗑️ Excluir Conta
+                <button className="action-btn danger" onClick={handleDeleteAccount}>
+                  <MdDelete /> Excluir Conta
                 </button>
               </div>
             </>
